@@ -1,0 +1,56 @@
+name: echoman
+
+services:  
+  server:
+    build:
+      context: ./.docker/go
+      dockerfile: Dockerfile
+    container_name: server.local
+    networks:
+      echoman:
+        ipv4_address: 10.0.3.95
+        ipv6_address: 2001:db8::5
+    privileged: true
+    restart: always
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "0"
+    tty: true
+    volumes:
+      - type: bind
+        source: ./server
+        target: /go/src/github.com/GotoRen/echoman/server
+        bind:
+          create_host_path: true
+    working_dir: /go/src/github.com/GotoRen/echoman/server
+ 
+  client:
+    build:
+      context: ./.docker/go
+      dockerfile: Dockerfile
+    container_name: client.local
+    networks:
+      echoman:
+        ipv4_address: 10.0.3.96
+        ipv6_address: 2001:db8::6
+    privileged: true
+    restart: always
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: "0"
+    tty: true
+    volumes:
+      - type: bind
+        source: ./client
+        target: /go/src/github.com/GotoRen/echoman/client
+        bind:
+          create_host_path: true
+    working_dir: /go/src/github.com/GotoRen/echoman/client
+
+networks:
+  echoman:
+    name: echoman_link
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.3.0/24
+        - subnet: 2001:db8::/64
+    enable_ipv6: true
