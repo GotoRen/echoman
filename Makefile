@@ -19,7 +19,7 @@ up: ## docker up
 logs: $(LOGS) ## docker logs 
 
 .PHONY: exec/server
-exec/sevrer: ## exec server container
+exec/server: ## exec server container
 	$(EXEC) server bash
 
 .PHONY: exec/client

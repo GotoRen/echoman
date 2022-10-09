@@ -61,7 +61,41 @@ func main() {
 			fmt.Println("[ERROR] Failed to read packet:", err)
 		}
 		fmt.Printf("GetPacket: %v\n", buf[:num])
+		DebugIPv4Packet(buf[14:num])
+		DebugICMPv4Packet(buf[14:num])
 		// internal.IPv4Packet(buf[:num])
-		internal.PrintPacketInfo(buf[:num])
+		// internal.PrintPacketInfo(buf[:num])
+
 	}
+}
+
+func DebugIPv4Packet(b []byte) {
+	fmt.Println()
+	fmt.Println("---------------------------------------------")
+	fmt.Println("IPv4 Layer")
+	fmt.Println("---------------------------------------------")
+	fmt.Println("[*] Version:", b[0])
+	fmt.Println("[*] Differentiated Services:", b[1])
+	fmt.Println("[*] Total Length:", b[2])
+	fmt.Println("[*] Identification:", b[3:5])
+	fmt.Println("[*] Offset:", b[6:8])
+	fmt.Println("[*] TTL:", b[9])
+	fmt.Println("[*] Protocol:", b[10])
+	fmt.Println("[*] Checksum:", b[11:12])
+	fmt.Println("[*] SrcIP:", b[12:16])
+	fmt.Println("[*] DstIP:", b[16:20])
+	fmt.Println()
+}
+
+func DebugICMPv4Packet(b []byte) {
+	fmt.Println("---------------------------------------------")
+	fmt.Println("ICMP Layer")
+	fmt.Println("---------------------------------------------")
+	fmt.Println("[*] Type:", b[20])
+	fmt.Println("[*] Code:", b[21])
+	fmt.Println("[*] Checksum:", b[22:24])
+	fmt.Println("[*] Identifier:", b[24:26])
+	fmt.Println("[*] SequenceNumber:", b[26:28])
+	fmt.Println("[*] TimeStamp:", b[28:36])
+	fmt.Println("[*] Data:", b[36:84])
 }

@@ -43,7 +43,7 @@ coverage: ## coverage
 	go tool cover -html=cover.out -o cover.html
 
 dump: 
-	$(DUMPCMD) -i ${INTERFACE} -w ./debug/dumpfile-server.pcapng
+	$(DUMPCMD) -i ${INTERFACE} -w ./debug/dumpfile-client.pcapng
 
 
 
