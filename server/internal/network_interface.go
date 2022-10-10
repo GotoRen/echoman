@@ -87,3 +87,12 @@ func getHardwareAddr(netInterface *net.Interface) {
 	}
 	fmt.Printf("Physical hardware address :%s \n", hwAddr.String())
 }
+
+func SetAdapterInterface() (*net.Interface, error) {
+	netInterface, err := net.InterfaceByName("eth0")
+	if err != nil {
+		return nil, err
+	}
+
+	return netInterface, err
+}

@@ -3,101 +3,105 @@ package internal
 import (
 	"encoding/binary"
 	"fmt"
-	"net"
+	"log"
 
+	"github.com/GotoRen/echoman/server/internal/logger"
+	"github.com/GotoRen/echoman/server/layers"
 	"github.com/google/gopacket"
-	"github.com/google/gopacket/layers"
 	golayers "github.com/google/gopacket/layers"
+	"golang.org/x/net/ipv4"
+	"golang.org/x/net/ipv6"
 )
 
-type EtherHeader struct {
-	DstMacAddr net.HardwareAddr
-	SrcMacAddr net.HardwareAddr
-	ProtoType  uint16
-}
-
-const (
-	EthTypeArp  uint16 = 0x0806
-	EthTypeIpv4 uint16 = 0x0800
-	EthTypeIpv6 uint16 = 0x86dd
-)
-
-func IPv4Packet(data []byte) {
-	dstMacAddr := data[:6]
-	srcMacAddr := data[6:12]
-	protoType := binary.BigEndian.Uint16(data[12:14])
-	eh := &EtherHeader{
-		DstMacAddr: dstMacAddr,
-		SrcMacAddr: srcMacAddr,
-		ProtoType:  protoType,
+func RoutineReceiveIncoming(buf []byte, size, sd4soc int) {
+	packet := gopacket.NewPacket(buf[:size], golayers.LayerTypeEthernet, gopacket.Default)
+	eh := &layers.EtherHeader{
+		DstMacAddr: buf[layers.DstMACAddrOffset : layers.DstMACAddrOffset+layers.DstMacLength],
+		SrcMacAddr: buf[layers.SrcMACAddrOffset : layers.SrcMACAddrOffset+layers.SrcMacLength],
+		ProtoType:  binary.BigEndian.Uint16(buf[layers.Protocoloffset : layers.Protocoloffset+layers.ProtocolTypeLength]),
 	}
-	if eh.ProtoType == EthTypeIpv4 {
-		packet := gopacket.NewPacket(data, golayers.LayerTypeEthernet, gopacket.Default)
-		ipLayer := packet.Layer(golayers.LayerTypeIPv4)
-		if ipLayer != nil {
-			fmt.Println("[*] IPv4 layer")
-			ipv4, _ := ipLayer.(*layers.IPv4)
-			fmt.Println("BaseLayer", ipv4.BaseLayer)
-			fmt.Println("Version", ipv4.Version)
-			fmt.Println("IHL", ipv4.IHL)
-			fmt.Println("TOS", ipv4.TOS)
-			fmt.Println("Length", ipv4.Length)
-			fmt.Println("Id", ipv4.Id)
-			fmt.Println("Flags", ipv4.Flags)
-			fmt.Println("FragOffset", ipv4.FragOffset)
-			fmt.Println("TTl", ipv4.TTL)
-			fmt.Println("Protocol", ipv4.Protocol)
-			fmt.Println("Checksum", ipv4.Checksum)
-			fmt.Println("SrcIP", ipv4.SrcIP)
-			fmt.Println("DstIP", ipv4.DstIP)
-			fmt.Println("Options", ipv4.Options)
-			fmt.Println("Padding", ipv4.Padding)
+
+	switch eh.ProtoType {
+	case layers.EthTypeIpv4:
+		if len(buf[layers.Etherlen:size]) < ipv4.HeaderLen {
+			logger.LogErr("Received IPv4 packet is too small", "error", len(buf[layers.Etherlen:size]))
 		}
-	}
-}
 
-func PrintPacketInfo(data []byte) {
-	packet := gopacket.NewPacket(data, golayers.LayerTypeEthernet, gopacket.Default)
-	ethernetLayer := packet.Layer(layers.LayerTypeEthernet)
-	if ethernetLayer != nil {
-		fmt.Println("[*] L2 EtherLayer")
-		ethernetPacket, _ := ethernetLayer.(*layers.Ethernet)
-		fmt.Println("Source MAC: ", ethernetPacket.SrcMAC)
-		fmt.Println("Destination MAC: ", ethernetPacket.DstMAC)
-		// Ethernet type is typically IPv4 but could be ARP or other
-		fmt.Println("Ethernet type: ", ethernetPacket.EthernetType)
-		fmt.Println()
-	}
+		udpLayer := packet.Layer(golayers.LayerTypeUDP)
+		if udpLayer != nil {
+			udp := udpLayer.(*golayers.UDP)
+			switch udp.DstPort.LayerType() {
+			case golayers.LayerTypeDHCPv4:
+				fmt.Println("[INFO] Received DHCPv4 packet")
+			case golayers.LayerTypeDNS:
+				fmt.Println("[INFO] Received DNS A record packet")
+			default:
+				if udp.DstPort.String() == layers.EchomanServerPort {
+					fmt.Println("[INFO] Received Original UDP packet")
+					// ここで新しくパケットを生成して返す
+					/**************************************************************/
+					// ここでUnmarshal => UDP構造体
+					udpres := NewUDPResponsePacket(buf)
+					// fmt.Printf("GetPacket: %v\n", udpres)
+					// layers.UnmarshalEtherPacket(udpres)
+					// layers.UnmarshalIPv4Packet(udpres)
+					// layers.UnmarshalUDPPacket(udpres)
+					if err := SendEtherPacket(sd4soc, udpres); err != nil {
+						log.Fatal(err)
+					}
+					/**************************************************************/
+				} else if udp.DstPort.String() == layers.EchomanClientPort {
+					// Do nothing.
+				} else {
+					logger.LogErr("Unknown IPv4 UDP packet type", "error", udp.DstPort)
+				}
+			}
+		}
+	case layers.EthTypeIpv6:
+		if len(buf[layers.Etherlen:size]) < ipv6.HeaderLen {
+			logger.LogErr("Received IPv6 packet is too small", "error", len(buf[layers.Etherlen:size]))
+		}
 
-	// IPパケットへキャスト
-	// Let's see if the packet is IP (even though the ether type told us)
-	ipLayer := packet.Layer(layers.LayerTypeIPv4)
-	if ipLayer != nil {
-		fmt.Println("IPv4 layer detected.")
-		ip, _ := ipLayer.(*layers.IPv4)
+		icmpv6Layer := packet.Layer(golayers.LayerTypeICMPv6)
+		if icmpv6Layer != nil {
+			icmpv6 := icmpv6Layer.(*golayers.ICMPv6)
+			switch icmpv6.TypeCode.Type() {
+			case golayers.ICMPv6TypeDestinationUnreachable:
+				// Do nothing.
+			case golayers.ICMPv6TypeEchoRequest:
+				fmt.Println("[INFO] Received ICMPv6 echo request")
+			case golayers.ICMPv6TypeEchoReply:
+				fmt.Println("[INFO] Received ICMPv6 echo replay")
+			case golayers.ICMPv6TypeRouterSolicitation:
+				fmt.Println("[INFO] Received Router Solicitation")
+			case golayers.ICMPv6TypeRouterAdvertisement:
+				fmt.Println("[INFO] Received Router Advertisement")
+			case golayers.ICMPv6TypeNeighborSolicitation:
+				fmt.Println("[INFO] Received Neighbor Solicitation")
+			case golayers.ICMPv6TypeNeighborAdvertisement:
+				fmt.Println("[INFO] Received Neighbor Advertisement")
+			case golayers.ICMPv6TypeMLDv2MulticastListenerReportMessageV2:
+				fmt.Println("[INFO] Received Multicast ListenerReport MessageV2")
+			default:
+				logger.LogErr("Unknown ICMPv6 packet type", "error", icmpv6.TypeCode.Type())
+			}
+		}
 
-		// IP layer variables:
-		// Version (Either 4 or 6)
-		// IHL (IP Header Length in 32-bit words)
-		// TOS, Length, Id, Flags, FragOffset, TTL, Protocol (TCP?),
-		// Checksum, SrcIP, DstIP
-		fmt.Printf("From %s to %s\n", ip.SrcIP, ip.DstIP)
-		fmt.Println("Protocol: ", ip.Protocol)
-		fmt.Println()
-	}
-
-	// IPパケットへキャスト
-	// Let's see if the packet is TCP
-	tcpLayer := packet.Layer(layers.LayerTypeTCP)
-	if tcpLayer != nil {
-		fmt.Println("TCP layer detected.")
-		tcp, _ := tcpLayer.(*layers.TCP)
-
-		// TCP layer variables:
-		// SrcPort, DstPort, Seq, Ack, DataOffset, Window, Checksum, Urgent
-		// Bool flags: FIN, SYN, RST, PSH, ACK, URG, ECE, CWR, NS
-		fmt.Printf("From port %d to %d\n", tcp.SrcPort, tcp.DstPort)
-		fmt.Println("Sequence number: ", tcp.Seq)
-		fmt.Println()
+		udpLayer := packet.Layer(golayers.LayerTypeUDP)
+		if udpLayer != nil {
+			udp := udpLayer.(*golayers.UDP)
+			switch udp.DstPort.LayerType() {
+			case golayers.LayerTypeDHCPv6:
+				fmt.Println("[INFO] Received DHCPv6 packet")
+			case golayers.LayerTypeDNS:
+				fmt.Println("[INFO] Received DNS AAAA record packet")
+			default:
+				logger.LogErr("Unknown IPv6 UDP packet type", "error", udp.DstPort.LayerType())
+			}
+		}
+	case layers.EthTypeArp:
+		fmt.Println("[INFO] Received ARP packet")
+	default:
+		logger.LogErr("Detect unknown protocol version", "error", eh.ProtoType)
 	}
 }

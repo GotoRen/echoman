@@ -9,12 +9,13 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/GotoRen/echoman/server/internal"
+	"github.com/GotoRen/echoman/server/internal/logger"
 )
 
-func EnvLoad() {
+func init() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal(err)
+		logger.LogErr("Error loading .env file", "error", err)
 	}
 }
 
@@ -28,7 +29,7 @@ func main() {
 	// netInterface, err = checkInterface(interf)
 	// if err != nil {
 	// 	fmt.Println(err)
-	// }
+	// }]
 	// getHardwareAddr(netInterface)
 
 	// // interf = "en10"
@@ -42,7 +43,7 @@ func main() {
 	// // fmt.Println(netInterface.HardwareAddr)
 
 	// getHardwareAddr(netInterface)
-	EnvLoad()
+	logger.InitZap()
 	i := internal.GetServerInfo(os.Getenv("SERVER_INTERFACE"))
 	fmt.Println("[INFO] Server Interface Information:", i.IfIndex)
 	fmt.Println("[INFO] L3 Server IPv4Address:", i.ServerIPv4)
@@ -50,53 +51,35 @@ func main() {
 
 	rv4soc, err := internal.RecvIPv4RawSocket(i.IfIndex)
 	if err != nil {
-		fmt.Println("[ERROR] Failed to open receive IPv6 Raw socket:", err)
+		log.Fatal(err)
 	}
 	defer syscall.Close(rv4soc)
 
-	internal.ServeListen() // linten: udp-> 3333
+	sd4soc, err := internal.EtherSendSock(i.IfIndex)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer syscall.Close(sd4soc)
+
+	internal.ListenServe() // linten: udp-> 30005
 
 	for {
 		buf := make([]byte, 1500)
-		num, _, err := syscall.Recvfrom(rv4soc, buf, 0)
+		size, _, err := syscall.Recvfrom(rv4soc, buf, 0)
 		if err != nil {
 			fmt.Println("[ERROR] Failed to read packet:", err)
 		}
-		fmt.Printf("GetPacket: %v\n", buf[:num])
-		DebugIPv4Packet(buf[14:num])
-		DebugICMPv4Packet(buf[14:num])
-		// internal.IPv4Packet(buf[:num])
-		// internal.PrintPacketInfo(buf[:num])
+		if size < 8 {
+			fmt.Println("error")
+			continue
+		}
+
+		// Packetを判断する
+		internal.RoutineReceiveIncoming(buf, size, sd4soc)
 	}
-}
 
-func DebugIPv4Packet(b []byte) {
-	fmt.Println()
-	fmt.Println("---------------------------------------------")
-	fmt.Println("IPv4 Layer")
-	fmt.Println("---------------------------------------------")
-	fmt.Println("[*] Version:", b[0])
-	fmt.Println("[*] Differentiated Services:", b[1])
-	fmt.Println("[*] Total Length:", b[2])
-	fmt.Println("[*] Identification:", b[3:5])
-	fmt.Println("[*] Offset:", b[6:8])
-	fmt.Println("[*] TTL:", b[9])
-	fmt.Println("[*] Protocol:", b[10])
-	fmt.Println("[*] Checksum:", b[11:12])
-	fmt.Println("[*] SrcIP:", b[12:16])
-	fmt.Println("[*] DstIP:", b[16:20])
-	fmt.Println()
-}
-
-func DebugICMPv4Packet(b []byte) {
-	fmt.Println("---------------------------------------------")
-	fmt.Println("ICMP Layer")
-	fmt.Println("---------------------------------------------")
-	fmt.Println("[*] Type:", b[20])
-	fmt.Println("[*] Code:", b[21])
-	fmt.Println("[*] Checksum:", b[22:24])
-	fmt.Println("[*] Identifier:", b[24:26])
-	fmt.Println("[*] SequenceNumber:", b[26:28])
-	fmt.Println("[*] TimeStamp:", b[28:36])
-	fmt.Println("[*] Data:", b[36:84])
+	// Pakcet を取得できたかどうか: recvSock
+	// PacketTypeを判別
+	// Unmarshal -> Generate
+	// Send: sendSock (echo)
 }

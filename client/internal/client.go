@@ -8,7 +8,7 @@ import (
 func portConf() (*net.UDPConn, error) {
 	udpAddr := &net.UDPAddr{
 		IP:   net.IPv4zero.To4(),
-		Port: 30005,
+		Port: 30006,
 	}
 
 	c, err := net.ListenUDP("udp4", udpAddr)

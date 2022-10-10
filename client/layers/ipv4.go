@@ -35,7 +35,17 @@ import (
 // 	DstIPAddr              []byte // 4 byte
 // }
 
-func IPv4PacketUnmarshal(b []byte) {
+const (
+	SrcIPv4Length = 4
+	DstIPv4Length = 4
+)
+
+const (
+	SrcIPv4AddrOffset = 26
+	DstIPv4AddrOffset = 30
+)
+
+func UnmarshalIPv4Packet(b []byte) {
 	packet := gopacket.NewPacket(b, golayers.LayerTypeEthernet, gopacket.Default)
 	ipv4Layer := packet.Layer(golayers.LayerTypeIPv4)
 	if ipv4Layer != nil {
