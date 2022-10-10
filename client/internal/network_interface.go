@@ -26,7 +26,7 @@ func getServerIPv4(intfIndex string, interfaces []net.Interface) (ipv4 net.IP) {
 	return nil
 }
 
-// checkInterface returns the obtained interface information
+// checkInterface returns the obtained interface information.
 func checkInterface(interf string) (netInterface *net.Interface, err error) {
 	for {
 		netInterface, err = net.InterfaceByName(interf)
@@ -41,7 +41,7 @@ func checkInterface(interf string) (netInterface *net.Interface, err error) {
 	return netInterface, nil
 }
 
-// getHardwareAddr retruns extract the hardware information base on the interface name
+// getHardwareAddr retruns extract the hardware information base on the interface name.
 func getHardwareAddr(netInterface *net.Interface) {
 	name := netInterface.Name
 	macAddress := netInterface.HardwareAddr

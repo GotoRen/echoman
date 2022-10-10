@@ -1,27 +1,15 @@
 package internal
 
 import (
-	"log"
-	"net"
-
 	"github.com/GotoRen/echoman/client/internal/logger"
 	"github.com/google/gopacket"
 	golayers "github.com/google/gopacket/layers"
 )
 
-func NewICMPv4Packet() []byte {
-	dstMacAddr, err := net.ParseMAC("02:42:0a:00:03:5f")
-	if err != nil {
-		log.Fatal(err)
-	}
-	srcMacAddr, err := net.ParseMAC("02:42:0a:00:03:60")
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func (device *Device) NewICMPv4Packet() []byte {
 	ether := golayers.Ethernet{
-		DstMAC:       dstMacAddr,
-		SrcMAC:       srcMacAddr,
+		DstMAC:       device.Peer.PeerMAC,
+		SrcMAC:       device.LocalMAC,
 		EthernetType: golayers.EthernetTypeIPv4,
 	}
 
@@ -34,8 +22,8 @@ func NewICMPv4Packet() []byte {
 		TTL:        255,
 		Protocol:   golayers.IPProtocolICMPv4,
 		Checksum:   0,
-		SrcIP:      net.ParseIP("10.0.3.96"),
-		DstIP:      net.ParseIP("10.0.3.95"),
+		SrcIP:      device.LocalIPv4,
+		DstIP:      device.Peer.PeerIPv4,
 	}
 
 	icmpv4 := golayers.ICMPv4{

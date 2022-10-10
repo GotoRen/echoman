@@ -7,8 +7,8 @@ import (
 	"github.com/GotoRen/echoman/client/layers"
 )
 
-func GenerateICMPv4Packet(fd int) {
-	icmpv4Packet := NewICMPv4Packet()
+func (device *Device) GenerateICMPv4Packet(fd int) {
+	icmpv4Packet := device.NewICMPv4Packet()
 	// layers.UnmarshalIPv4Packet(icmpv4Packet)
 	// layers.UnmarshalICMPv4Packet(icmpv4Packet)
 	if err := SendEtherPacket(fd, icmpv4Packet); err != nil {

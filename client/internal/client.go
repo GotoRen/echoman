@@ -1,9 +1,9 @@
 package internal
 
 import (
-	"fmt"
-	"log"
 	"net"
+
+	"github.com/GotoRen/echoman/client/internal/logger"
 )
 
 func portConf(lp uint16) (*net.UDPConn, error) {
@@ -11,7 +11,6 @@ func portConf(lp uint16) (*net.UDPConn, error) {
 		IP:   net.IPv4zero.To4(),
 		Port: int(lp),
 	}
-	fmt.Println("lp:", lp)
 
 	c, err := net.ListenUDP("udp4", udpAddr)
 	if err != nil {
@@ -28,10 +27,10 @@ func listenUDPPort(c *net.UDPConn) {
 	}
 }
 
-func (device *Device) ListenServe() {
+func (device *Device) ListenClient() {
 	conn, err := portConf(device.LocalUDPPort)
 	if err != nil {
-		log.Fatal(err)
+		logger.LogErr("Failed to create connection", "error", err)
 	}
 
 	go listenUDPPort(conn)

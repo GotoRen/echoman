@@ -53,6 +53,17 @@ func UnmarshalICMPv4Packet(b []byte) {
 	}
 }
 
+func DebugICMPv4Message(b []byte) {
+	packet := gopacket.NewPacket(b, golayers.LayerTypeEthernet, gopacket.Default)
+	icmpv4Layer := packet.Layer(golayers.LayerTypeICMPv4)
+	if icmpv4Layer != nil {
+		icmpv4, _ := icmpv4Layer.(*golayers.ICMPv4)
+		fmt.Println("---------------------------------------------")
+		fmt.Println("[*] ICMPv4 - Payload:", icmpv4.Payload)
+		fmt.Println("---------------------------------------------")
+	}
+}
+
 func DebugICMPv4Packet(b []byte) {
 	fmt.Println("---------------------------------------------")
 	fmt.Println("ICMP Layer")

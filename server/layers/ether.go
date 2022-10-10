@@ -20,6 +20,7 @@ const (
 	EthTypeIpv6 uint16 = 0x86dd
 )
 
+// Ether packet length.
 const (
 	DstMacLength       = 6
 	SrcMacLength       = 6

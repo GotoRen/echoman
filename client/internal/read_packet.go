@@ -12,7 +12,7 @@ import (
 	"golang.org/x/net/ipv6"
 )
 
-func RoutineReceiveIncoming(buf []byte, size, sd4soc int) {
+func (device *Device) RoutineReceiveIncoming(buf []byte, size, sd4soc int) {
 	packet := gopacket.NewPacket(buf[:size], golayers.LayerTypeEthernet, gopacket.Default)
 	eh := &layers.EtherHeader{
 		DstMacAddr: buf[layers.DstMACAddrOffset : layers.DstMACAddrOffset+layers.DstMacLength],

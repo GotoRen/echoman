@@ -19,8 +19,8 @@ func init() {
 }
 
 func main() {
-	t := time.NewTicker(time.Second * 1)
 	logger.InitZap()
+	t := time.NewTicker(time.Second * 1)
 
 	device := internal.GetDeviceInfo(os.Getenv("CLIENT_INTERFACE"))
 	fmt.Println("[INFO] Local Interface Information:", device.IfIndex)
@@ -33,11 +33,11 @@ func main() {
 	defer syscall.Close(device.Sd4soc)
 	defer syscall.Close(device.Rv4soc)
 
-	device.ListenServe() // listen: udp-> 30006
+	device.ListenClient()
 
 	for {
 		<-t.C
-		// internal.GenerateICMPv4Packet(sd4soc)
+		// device.GenerateICMPv4Packet(device.Sd4soc)
 		device.GenerateUDPPacket(device.Sd4soc)
 
 		buf := make([]byte, 1500)
@@ -50,6 +50,6 @@ func main() {
 			continue
 		}
 
-		internal.RoutineReceiveIncoming(buf, size, device.Sd4soc)
+		device.RoutineReceiveIncoming(buf, size, device.Sd4soc)
 	}
 }

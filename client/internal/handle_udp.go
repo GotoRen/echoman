@@ -7,15 +7,6 @@ import (
 )
 
 func (device *Device) NewUDPPacket() []byte {
-	// dstMacAddr, err := net.ParseMAC("02:42:0a:00:03:5f")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// srcMacAddr, err := net.ParseMAC("02:42:0a:00:03:60")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
 	ether := golayers.Ethernet{
 		DstMAC:       device.Peer.PeerMAC,
 		SrcMAC:       device.LocalMAC,
