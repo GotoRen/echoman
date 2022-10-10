@@ -22,7 +22,9 @@ func main() {
 	logger.InitZap()
 	t := time.NewTicker(time.Second * 1)
 
-	device := internal.GetDeviceInfo(os.Getenv("CLIENT_INTERFACE"))
+	paket_type := os.Getenv("PACKET_TYPE")
+
+	device := internal.GetDeviceInfo(os.Getenv("LOCAL_INTERFACE"))
 	fmt.Println("[INFO] Local Interface Information:", device.IfIndex)
 	fmt.Println("[INFO] Local IPv4 Address:", device.LocalIPv4)
 	fmt.Println("[INFO] Local Hardware Address:", device.LocalMAC)
@@ -37,8 +39,16 @@ func main() {
 
 	for {
 		<-t.C
-		// device.GenerateICMPv4Packet(device.Sd4soc)
-		device.GenerateUDPPacket(device.Sd4soc)
+
+		switch paket_type {
+		case "ICMPV4":
+			device.GenerateICMPv4Packet(device.Sd4soc)
+		case "UDPV4":
+			device.GenerateUDPPacket(device.Sd4soc)
+		default:
+			logger.LogErr("You chose a mode that doesn't exist", "error", paket_type)
+			os.Exit(1)
+		}
 
 		buf := make([]byte, 1500)
 		size, _, err := syscall.Recvfrom(device.Rv4soc, buf, 0)

@@ -50,11 +50,12 @@ func (device *Device) RoutineReceiveIncoming(buf []byte, size, sd4soc int) {
 			case golayers.LayerTypeDNS:
 				logger.LogDebug("Received DNS A record packet", "DNS", udp.DstPort.LayerType())
 			default:
-				if udp.DstPort.String() == layers.EchomanServerPort {
-					// fmt.Println("[INFO] Received Echoman UDP request packet")
-				} else if udp.DstPort.String() == layers.EchomanClientPort {
+				if udp.DstPort == golayers.UDPPort(device.Peer.PeerUDPPort) {
+					// Echoman requst
+					// Do nothing.
+				} else if udp.DstPort == golayers.UDPPort(device.LocalUDPPort) {
+					// Echoman response
 					layers.DebugUDPMessage(buf)
-					// fmt.Println("[INFO] Received Echoman UDP response packet")
 				} else {
 					logger.LogErr("Unknown IPv4 UDP packet type", "error", udp.DstPort)
 				}

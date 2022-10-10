@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/GotoRen/echoman/client/internal/logger"
+	"github.com/GotoRen/echoman/server/internal/logger"
 )
 
 type Device struct {

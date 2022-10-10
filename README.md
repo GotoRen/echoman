@@ -1,4 +1,4 @@
-# echoman
+# 🐶 echoman: Simple echo server using Rawsocket
 
 ## 🌱 Overview
 - これはTCP/IPの上でClientがパケットを生成してServerへ送信するだけの簡単なツールです
@@ -10,7 +10,7 @@
 ### Socket functions
 <img src="https://user-images.githubusercontent.com/63791288/194802596-fbed4e9f-4877-45a9-817d-14522b8a5c2c.png" alt="ansible" width="280" height="400" />
 
-### Used function: client
+### Used function
 | args | syscall |
 | :--- | :---: |
 | Domain | `AF_PACKET` | 
@@ -18,8 +18,8 @@
 | Protocols | `ETH_P_IP` | 
 
 ```go
-### Client側: 受信ソケットの生成
-func EtherSendSock(intfIndex *net.Interface) (int, error) {
+### 送信ソケットの生成
+func etherSendSock(intfIndex *net.Interface) (int, error) {
 	fd, err := syscall.Socket(syscall.AF_PACKET, syscall.SOCK_RAW, int(htons(syscall.ETH_P_IP)))
 	if err != nil {
 		return -1, err
@@ -36,15 +36,48 @@ func EtherSendSock(intfIndex *net.Interface) (int, error) {
 
 	return fd, nil
 }
-```
 
-### Used function: server
+### 受信ソケットの生成
+func etherRecvSock(intfIndex *net.Interface) (int, error) {
+	fd, err := syscall.Socket(syscall.AF_PACKET, syscall.SOCK_RAW, int(htons(syscall.ETH_P_IP)))
+	if err != nil {
+		return -1, err
+	}
+
+	addr := syscall.SockaddrLinklayer{
+		Protocol: htons(syscall.ETH_P_ALL),
+		Ifindex:  intfIndex.Index,
+	}
+	if err := syscall.Bind(fd, &addr); err != nil {
+		return -1, err
+	}
+
+	// Received in promiscuous mode
+	if err := syscall.SetLsfPromisc(intfIndex.Name, true); err != nil {
+		return -1, err
+	}
+
+	return fd, nil
+}
+
+### Ethernetパケット（L2~）の送信
+func SendEtherPacket(fd int, b []byte) error {
+	if _, err := syscall.Write(fd, b); err != nil {
+		return err
+	}
+	
+	return nil
+}
+```
 
 ## 🚀 Usage
 ```sh
 ### envをコピー
 $ cp server/.env{.sample,}
 $ cp client/.env{.sample,}
+
+### .envの中身を環境に合わせて書き換える
+※注意: Docker networkではMACアドレスはランダムに生成されます
 
 ### docker-composeを起動
 $ make up
@@ -61,10 +94,15 @@ $ make exec/client
 ---
 
 ### Echoman clientはデフォルトでUDPを喋ります
--> .env を編集することで生成するパケットを（ICMPv4, UDP）切り替えることができます
+-> .env を編集することで生成するパケットタイプを切り替える
+PACKET_TYPE=[パケットタイプ]
 ```
+| PacketType | Env Value |
+| :--- | :---: |
+| ICMPv4 | `ICMPV4` |
+| UDPv4 | `UDPV4` |
 
-## 📖 Information
+## 📖 Default Information
 
 | Device | Information |
 | :--- | ---: |
@@ -72,7 +110,6 @@ $ make exec/client
 | Echoman Server Port number | `30005` |
 | Echoman Client IPv4 address | `10.0.3.96` |
 | Echoman Client Port number | `30006` |
-
 
 ## 📚 References
 - [RFC 792](https://www.rfc-editor.org/rfc/rfc792)

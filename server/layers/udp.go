@@ -8,11 +8,6 @@ import (
 )
 
 const (
-	EchomanServerPort string = "30005"
-	EchomanClientPort string = "30006"
-)
-
-const (
 	SrcUDPLength = 2
 	DstUDPLength = 2
 )

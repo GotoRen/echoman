@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"syscall"
 
@@ -20,54 +19,24 @@ func init() {
 }
 
 func main() {
-	// var interf string
-	// var netInterface *net.Interface
-	// var err error
-
-	// interf = "eth0"
-	// // interf = "eth0"
-	// netInterface, err = checkInterface(interf)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }]
-	// getHardwareAddr(netInterface)
-
-	// // interf = "en10"
-	// // interf = "eth1"
-	// netInterface, err = checkInterface(interf)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-
-	// // fmt.Println(netInterface.Name)
-	// // fmt.Println(netInterface.HardwareAddr)
-
-	// getHardwareAddr(netInterface)
 	logger.InitZap()
-	i := internal.GetServerInfo(os.Getenv("SERVER_INTERFACE"))
-	fmt.Println("[INFO] Server Interface Information:", i.IfIndex)
-	fmt.Println("[INFO] L3 Server IPv4Address:", i.ServerIPv4)
-	fmt.Println("[INFO] L2 Server HardwareAddress:", i.ServerMAC)
 
-	// 受信ソケット
-	rv4soc, err := internal.RecvIPv4RawSocket(i.IfIndex)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer syscall.Close(rv4soc)
+	device := internal.GetDeviceInfo(os.Getenv("LOCAL_INTERFACE"))
+	fmt.Println("[INFO] Local Interface Information:", device.IfIndex)
+	fmt.Println("[INFO] Local IPv4 Address:", device.LocalIPv4)
+	fmt.Println("[INFO] Local Hardware Address:", device.LocalMAC)
+	fmt.Println("[INFO] Peer IPv4 Address:", device.Peer.PeerIPv4)
+	fmt.Println("[INFO] Peer Hardware Address:", device.Peer.PeerMAC)
 
-	// 送信ソケット
-	sd4soc, err := internal.EtherSendSock(i.IfIndex)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer syscall.Close(sd4soc)
+	device.CreateDescriptor()
+	defer syscall.Close(device.Sd4soc)
+	defer syscall.Close(device.Rv4soc)
 
-	internal.ListenServe() // listen: udp-> 30005
+	device.ListenServer()
 
 	for {
 		buf := make([]byte, 1500)
-		size, _, err := syscall.Recvfrom(rv4soc, buf, 0)
+		size, _, err := syscall.Recvfrom(device.Rv4soc, buf, 0)
 		if err != nil {
 			fmt.Println("[ERROR] Failed to read packet:", err)
 		}
@@ -75,11 +44,7 @@ func main() {
 			fmt.Println("error")
 			continue
 		}
-		internal.RoutineReceiveIncoming(buf, size, sd4soc)
-	}
 
-	// Pakcet を取得できたかどうか: recvSock
-	// PacketTypeを判別
-	// Unmarshal -> Generate
-	// Send: sendSock (echo)
+		device.RoutineReceiveIncoming(buf, size, device.Sd4soc)
+	}
 }
