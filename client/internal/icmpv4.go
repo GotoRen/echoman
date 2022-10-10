@@ -46,7 +46,7 @@ func NewICMPv4Packet() []byte {
 	}
 
 	// ICMPv4 Max payload length: 48 byte
-	rdm_data := []byte{
+	req_data := []byte{
 		34, 43, 67, 99,
 		0, 0, 0, 0,
 		49, 129, 5, 0,
@@ -74,7 +74,7 @@ func NewICMPv4Packet() []byte {
 		&ether,
 		&ip,
 		&icmpv4,
-		gopacket.Payload(rdm_data),
+		gopacket.Payload(req_data),
 	); err != nil {
 		logger.LogErr("Serialize error", "error", err)
 		return nil

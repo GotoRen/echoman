@@ -49,12 +49,14 @@ func main() {
 	fmt.Println("[INFO] L3 Server IPv4Address:", i.ServerIPv4)
 	fmt.Println("[INFO] L2 Server HardwareAddress:", i.ServerMAC)
 
+	// 受信ソケット
 	rv4soc, err := internal.RecvIPv4RawSocket(i.IfIndex)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer syscall.Close(rv4soc)
 
+	// 送信ソケット
 	sd4soc, err := internal.EtherSendSock(i.IfIndex)
 	if err != nil {
 		log.Fatal(err)

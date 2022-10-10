@@ -46,8 +46,8 @@ func main() {
 
 	for {
 		<-t.C
-		// internal.GenerateICMPv4Packet(fd)
-		internal.GenerateUDPPacket(fd)
+		internal.GenerateICMPv4Packet(fd)
+		// internal.GenerateUDPPacket(fd)
 
 		buf := make([]byte, 1500)
 		size, _, err := syscall.Recvfrom(rv4soc, buf, 0)
@@ -61,6 +61,6 @@ func main() {
 
 		layers.UnmarshalEtherPacket(buf)
 		layers.UnmarshalIPv4Packet(buf)
-		layers.UnmarshalUDPPacket(buf)
+		layers.UnmarshalICMPv4Packet(buf)
 	}
 }

@@ -27,6 +27,28 @@ func RoutineReceiveIncoming(buf []byte, size, sd4soc int) {
 			logger.LogErr("Received IPv4 packet is too small", "error", len(buf[layers.Etherlen:size]))
 		}
 
+		icmpv4Layer := packet.Layer(golayers.LayerTypeICMPv4)
+		if icmpv4Layer != nil {
+			icmpv4 := icmpv4Layer.(*golayers.ICMPv4)
+			switch icmpv4.TypeCode.Type() {
+			case golayers.ICMPv4TypeEchoRequest:
+				fmt.Println("[INFO] Received ICMPv4 echo request")
+				icmpv4res := NewICMPv4ReplayPacket(buf)
+				// layers.UnmarshalEtherPacket(icmpv4res)
+				// layers.UnmarshalIPv4Packet(icmpv4res)
+				// layers.UnmarshalICMPv4Packet(icmpv4res)
+				if err := SendEtherPacket(sd4soc, icmpv4res); err != nil {
+					log.Fatal(err)
+				} else {
+					fmt.Println("[INFO] Generate ICMPv4 echo replay packet")
+				}
+			case golayers.ICMPv4TypeEchoReply:
+				fmt.Println("[INFO] Received ICMPv4 echo replay")
+			default:
+				logger.LogErr("Unknown ICMPv4 packet type", "error", icmpv4.TypeCode.Type())
+			}
+		}
+
 		udpLayer := packet.Layer(golayers.LayerTypeUDP)
 		if udpLayer != nil {
 			udp := udpLayer.(*golayers.UDP)
@@ -37,19 +59,16 @@ func RoutineReceiveIncoming(buf []byte, size, sd4soc int) {
 				fmt.Println("[INFO] Received DNS A record packet")
 			default:
 				if udp.DstPort.String() == layers.EchomanServerPort {
-					fmt.Println("[INFO] Received Original UDP packet")
-					// ここで新しくパケットを生成して返す
-					/**************************************************************/
-					// ここでUnmarshal => UDP構造体
+					fmt.Println("[INFO] Received Echoman UDP request packet")
 					udpres := NewUDPResponsePacket(buf)
-					// fmt.Printf("GetPacket: %v\n", udpres)
 					// layers.UnmarshalEtherPacket(udpres)
 					// layers.UnmarshalIPv4Packet(udpres)
 					// layers.UnmarshalUDPPacket(udpres)
 					if err := SendEtherPacket(sd4soc, udpres); err != nil {
 						log.Fatal(err)
+					} else {
+						fmt.Println("[INFO] Generate UDP response packet")
 					}
-					/**************************************************************/
 				} else if udp.DstPort.String() == layers.EchomanClientPort {
 					// Do nothing.
 				} else {

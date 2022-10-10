@@ -42,7 +42,7 @@ func NewUDPPacket() []byte {
 		SrcPort: 30006,
 		DstPort: 30005,
 	}
-	rdm_data := []byte("Ping")
+	data := []byte("Ping")
 
 	// calculating checksum
 	if err := udp.SetNetworkLayerForChecksum(&ip); err != nil {
@@ -61,7 +61,7 @@ func NewUDPPacket() []byte {
 		&ether,
 		&ip,
 		&udp,
-		gopacket.Payload(rdm_data),
+		gopacket.Payload(data),
 	); err != nil {
 		logger.LogErr("Serialize error", "error", err)
 		return nil

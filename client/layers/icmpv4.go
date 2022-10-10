@@ -29,6 +29,15 @@ import (
 // 	Data           []byte // 48 byte
 // }
 
+const (
+	ICMPv4TimeStampLength = 8
+	ICMPv4DataLength      = 48
+)
+
+const (
+	ICMPv4Dataoffset = 42
+)
+
 func UnmarshalICMPv4Packet(b []byte) {
 	packet := gopacket.NewPacket(b, golayers.LayerTypeEthernet, gopacket.Default)
 	icmpv4Layer := packet.Layer(golayers.LayerTypeICMPv4)
@@ -39,6 +48,7 @@ func UnmarshalICMPv4Packet(b []byte) {
 		fmt.Println("[*] ICMPv4 - Chechsum:", icmpv4.Checksum)
 		fmt.Println("[*] ICMPv4 - Identifier:", icmpv4.Id)
 		fmt.Println("[*] ICMPv4 - SequenceNumber:", icmpv4.Seq)
+		fmt.Println("[*] ICMPv4 - Payload:", icmpv4.Payload)
 		fmt.Println("---------------------------------------------")
 	}
 }
@@ -53,5 +63,5 @@ func DebugICMPv4Packet(b []byte) {
 	fmt.Println("[*] Identifier:", b[24:26])
 	fmt.Println("[*] SequenceNumber:", b[26:28])
 	fmt.Println("[*] TimeStamp:", b[28:36])
-	fmt.Println("[*] Data:", b[36:84])
+	fmt.Println("[*] Payload:", b[36:84])
 }

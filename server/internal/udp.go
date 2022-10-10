@@ -42,7 +42,7 @@ func NewUDPResponsePacket(req []byte) []byte {
 		SrcPort: golayers.UDPPort(srcPort),
 		DstPort: golayers.UDPPort(dstPort),
 	}
-	rdm_data := []byte("Pong")
+	data := []byte("Pong")
 
 	// calculating checksum
 	if err := udp.SetNetworkLayerForChecksum(&ip); err != nil {
@@ -61,7 +61,7 @@ func NewUDPResponsePacket(req []byte) []byte {
 		&ether,
 		&ip,
 		&udp,
-		gopacket.Payload(rdm_data),
+		gopacket.Payload(data),
 	); err != nil {
 		logger.LogErr("Serialize error", "error", err)
 		return nil
