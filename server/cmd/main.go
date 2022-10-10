@@ -54,6 +54,8 @@ func main() {
 	}
 	defer syscall.Close(rv4soc)
 
+	internal.ServeListen() // linten: udp-> 3333
+
 	for {
 		buf := make([]byte, 1500)
 		num, _, err := syscall.Recvfrom(rv4soc, buf, 0)
@@ -65,7 +67,6 @@ func main() {
 		DebugICMPv4Packet(buf[14:num])
 		// internal.IPv4Packet(buf[:num])
 		// internal.PrintPacketInfo(buf[:num])
-
 	}
 }
 

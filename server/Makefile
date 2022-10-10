@@ -42,8 +42,14 @@ coverage: ## coverage
 	go test -coverprofile=cover.out ./...
 	go tool cover -html=cover.out -o cover.html
 
-dump: 
+dump: ## dump packet
+	$(DUMPCMD) -i ${INTERFACE}
+
+dump/out: ## dump packet and output to file
 	$(DUMPCMD) -i ${INTERFACE} -w ./debug/dumpfile-server.pcapng
+
+listen: ## check listen port
+	lsof -i -P
 
 
 
