@@ -46,9 +46,9 @@ func RoutineReceiveIncoming(buf []byte, size, sd4soc int) {
 			udp := udpLayer.(*golayers.UDP)
 			switch udp.DstPort.LayerType() {
 			case golayers.LayerTypeDHCPv4:
-				fmt.Println("[INFO] Received DHCPv4 packet")
+				logger.LogDebug("Received DHCPv4 packet", "DHCPv4", udp.DstPort.LayerType())
 			case golayers.LayerTypeDNS:
-				fmt.Println("[INFO] Received DNS A record packet")
+				logger.LogDebug("Received DNS A record packet", "DNS", udp.DstPort.LayerType())
 			default:
 				if udp.DstPort.String() == layers.EchomanServerPort {
 					// fmt.Println("[INFO] Received Echoman UDP request packet")
@@ -72,19 +72,19 @@ func RoutineReceiveIncoming(buf []byte, size, sd4soc int) {
 			case golayers.ICMPv6TypeDestinationUnreachable:
 				fmt.Println("[ERROR] Received ICMPv6 Destination Unreachable")
 			case golayers.ICMPv6TypeEchoRequest:
-				fmt.Println("[INFO] Received ICMPv6 echo request")
+				logger.LogDebug("Received ICMPv6 echo request", "ICMPv6", icmpv6.TypeCode.Type())
 			case golayers.ICMPv6TypeEchoReply:
-				fmt.Println("[INFO] Received ICMPv6 echo replay")
+				logger.LogDebug("Received ICMPv6 echo replay", "ICMPv6", icmpv6.TypeCode.Type())
 			case golayers.ICMPv6TypeRouterSolicitation:
-				fmt.Println("[INFO] Received Router Solicitation")
+				logger.LogDebug("Received Router Solicitation", "ICMPv6", icmpv6.TypeCode.Type())
 			case golayers.ICMPv6TypeRouterAdvertisement:
-				fmt.Println("[INFO] Received Router Advertisement")
+				logger.LogDebug("Received Router Advertisement", "ICMPv6", icmpv6.TypeCode.Type())
 			case golayers.ICMPv6TypeNeighborSolicitation:
-				fmt.Println("[INFO] Received Neighbor Solicitation")
+				logger.LogDebug("Received Neighbor Solicitation", "ICMPv6", icmpv6.TypeCode.Type())
 			case golayers.ICMPv6TypeNeighborAdvertisement:
-				fmt.Println("[INFO] Received Neighbor Advertisement")
+				logger.LogDebug("Received Neighbor Advertisement", "ICMPv6", icmpv6.TypeCode.Type())
 			case golayers.ICMPv6TypeMLDv2MulticastListenerReportMessageV2:
-				fmt.Println("[INFO] Received Multicast ListenerReport MessageV2")
+				logger.LogDebug("Received Multicast ListenerReport MessageV2", "ICMPv6", icmpv6.TypeCode.Type())
 			default:
 				logger.LogErr("Unknown ICMPv6 packet type", "error", icmpv6.TypeCode.Type())
 			}
@@ -95,9 +95,9 @@ func RoutineReceiveIncoming(buf []byte, size, sd4soc int) {
 			udp := udpLayer.(*golayers.UDP)
 			switch udp.DstPort.LayerType() {
 			case golayers.LayerTypeDHCPv6:
-				fmt.Println("[INFO] Received DHCPv6 packet")
+				logger.LogDebug("Received DHCPv6 packet", "DHCPv6", udp.DstPort.LayerType())
 			case golayers.LayerTypeDNS:
-				fmt.Println("[INFO] Received DNS AAAA record packet")
+				logger.LogDebug("Received DNS AAAA record packet", "DNS", udp.DstPort.LayerType())
 			default:
 				logger.LogErr("Unknown IPv6 UDP packet type", "error", udp.DstPort.LayerType())
 			}

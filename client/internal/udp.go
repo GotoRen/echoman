@@ -1,27 +1,24 @@
 package internal
 
 import (
-	"log"
-	"net"
-
 	"github.com/GotoRen/echoman/client/internal/logger"
 	"github.com/google/gopacket"
 	golayers "github.com/google/gopacket/layers"
 )
 
-func NewUDPPacket() []byte {
-	dstMacAddr, err := net.ParseMAC("02:42:0a:00:03:5f")
-	if err != nil {
-		log.Fatal(err)
-	}
-	srcMacAddr, err := net.ParseMAC("02:42:0a:00:03:60")
-	if err != nil {
-		log.Fatal(err)
-	}
+func (device *Device) NewUDPPacket() []byte {
+	// dstMacAddr, err := net.ParseMAC("02:42:0a:00:03:5f")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// srcMacAddr, err := net.ParseMAC("02:42:0a:00:03:60")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	ether := golayers.Ethernet{
-		DstMAC:       dstMacAddr,
-		SrcMAC:       srcMacAddr,
+		DstMAC:       device.Peer.PeerMAC,
+		SrcMAC:       device.LocalMAC,
 		EthernetType: golayers.EthernetTypeIPv4,
 	}
 
@@ -34,13 +31,13 @@ func NewUDPPacket() []byte {
 		TTL:        255,
 		Protocol:   golayers.IPProtocolUDP,
 		Checksum:   0,
-		SrcIP:      net.ParseIP("10.0.3.96"),
-		DstIP:      net.ParseIP("10.0.3.95"),
+		SrcIP:      device.LocalIPv4,
+		DstIP:      device.Peer.PeerIPv4,
 	}
 
 	udp := golayers.UDP{
-		SrcPort: 30006,
-		DstPort: 30005,
+		SrcPort: golayers.UDPPort(device.LocalUDPPort),
+		DstPort: golayers.UDPPort(device.Peer.PeerUDPPort),
 	}
 	data := []byte("Ping")
 

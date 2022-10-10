@@ -27,11 +27,11 @@ func NewICMPv4Packet() []byte {
 
 	ip := golayers.IPv4{
 		Version:    4,
-		TOS:        0,   // Type of Service
-		Length:     0,   // Total Length
-		Id:         0,   // Identification
-		FragOffset: 0,   // FragOffset
-		TTL:        255, // Time To Live
+		TOS:        0,
+		Length:     0,
+		Id:         0,
+		FragOffset: 0,
+		TTL:        255,
 		Protocol:   golayers.IPProtocolICMPv4,
 		Checksum:   0,
 		SrcIP:      net.ParseIP("10.0.3.96"),

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"syscall"
 	"time"
@@ -21,36 +20,28 @@ func init() {
 
 func main() {
 	t := time.NewTicker(time.Second * 1)
-
 	logger.InitZap()
-	i := internal.GetServerInfo(os.Getenv("CLIENT_INTERFACE"))
-	fmt.Println("[INFO] Server Interface Information:", i.IfIndex)
-	fmt.Println("[INFO] L3 Server IPv4Address:", i.ServerIPv4)
-	fmt.Println("[INFO] L2 Server HardwareAddress:", i.ServerMAC)
 
-	// 送信ソケット
-	sd4soc, err := internal.EtherSendSock(i.IfIndex)
-	if err != nil {
-		logger.LogErr("Failed to open send IPv4 raw socket", "error", err)
-	}
+	device := internal.GetDeviceInfo(os.Getenv("CLIENT_INTERFACE"))
+	fmt.Println("[INFO] Local Interface Information:", device.IfIndex)
+	fmt.Println("[INFO] Local IPv4 Address:", device.LocalIPv4)
+	fmt.Println("[INFO] Local Hardware Address:", device.LocalMAC)
+	fmt.Println("[INFO] Peer IPv4 Address:", device.Peer.PeerIPv4)
+	fmt.Println("[INFO] Peer Hardware Address:", device.Peer.PeerMAC)
 
-	// 受信ソケット
-	rv4soc, err := internal.RecvIPv4RawSocket(i.IfIndex)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer syscall.Close(rv4soc)
+	device.CreateDescriptor()
+	defer syscall.Close(device.Sd4soc)
+	defer syscall.Close(device.Rv4soc)
 
-	internal.ListenServe() // linten: udp-> 30006
+	device.ListenServe() // listen: udp-> 30006
 
 	for {
 		<-t.C
-
-		internal.GenerateICMPv4Packet(sd4soc)
-		// internal.GenerateUDPPacket(sd4soc)
+		// internal.GenerateICMPv4Packet(sd4soc)
+		device.GenerateUDPPacket(device.Sd4soc)
 
 		buf := make([]byte, 1500)
-		size, _, err := syscall.Recvfrom(rv4soc, buf, 0)
+		size, _, err := syscall.Recvfrom(device.Rv4soc, buf, 0)
 		if err != nil {
 			fmt.Println("[ERROR] Failed to read packet:", err)
 		}
@@ -59,9 +50,6 @@ func main() {
 			continue
 		}
 
-		// layers.UnmarshalEtherPacket(buf)
-		// layers.UnmarshalIPv4Packet(buf)
-		// layers.UnmarshalICMPv4Packet(buf)
-		internal.RoutineReceiveIncoming(buf, size, sd4soc)
+		internal.RoutineReceiveIncoming(buf, size, device.Sd4soc)
 	}
 }

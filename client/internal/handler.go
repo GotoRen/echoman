@@ -18,8 +18,8 @@ func GenerateICMPv4Packet(fd int) {
 	}
 }
 
-func GenerateUDPPacket(fd int) {
-	udpPacket := NewUDPPacket()
+func (device *Device) GenerateUDPPacket(fd int) {
+	udpPacket := device.NewUDPPacket()
 	// layers.UnmarshalIPv4Packet(udpPacket)
 	// layers.UnmarshalICMPv4Packet(udpPacket)
 	layers.DebugUDPMessage(udpPacket)

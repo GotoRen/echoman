@@ -63,7 +63,7 @@ func main() {
 	}
 	defer syscall.Close(sd4soc)
 
-	internal.ListenServe() // linten: udp-> 30005
+	internal.ListenServe() // listen: udp-> 30005
 
 	for {
 		buf := make([]byte, 1500)
