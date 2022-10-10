@@ -9,7 +9,6 @@ import (
 
 	"github.com/GotoRen/echoman/client/internal"
 	"github.com/GotoRen/echoman/client/internal/logger"
-	"github.com/GotoRen/echoman/client/layers"
 	"github.com/joho/godotenv"
 )
 
@@ -30,7 +29,7 @@ func main() {
 	fmt.Println("[INFO] L2 Server HardwareAddress:", i.ServerMAC)
 
 	// 送信ソケット
-	fd, err := internal.EtherSendSock(i.IfIndex)
+	sd4soc, err := internal.EtherSendSock(i.IfIndex)
 	if err != nil {
 		logger.LogErr("Failed to open send IPv4 raw socket", "error", err)
 	}
@@ -46,8 +45,9 @@ func main() {
 
 	for {
 		<-t.C
-		internal.GenerateICMPv4Packet(fd)
-		// internal.GenerateUDPPacket(fd)
+
+		internal.GenerateICMPv4Packet(sd4soc)
+		// internal.GenerateUDPPacket(sd4soc)
 
 		buf := make([]byte, 1500)
 		size, _, err := syscall.Recvfrom(rv4soc, buf, 0)
@@ -59,8 +59,9 @@ func main() {
 			continue
 		}
 
-		layers.UnmarshalEtherPacket(buf)
-		layers.UnmarshalIPv4Packet(buf)
-		layers.UnmarshalICMPv4Packet(buf)
+		// layers.UnmarshalEtherPacket(buf)
+		// layers.UnmarshalIPv4Packet(buf)
+		// layers.UnmarshalICMPv4Packet(buf)
+		internal.RoutineReceiveIncoming(buf, size, sd4soc)
 	}
 }

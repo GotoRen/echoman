@@ -37,3 +37,14 @@ func UnmarshalUDPPacket(b []byte) {
 		fmt.Println("---------------------------------------------")
 	}
 }
+
+func DebugUDPMessage(b []byte) {
+	packet := gopacket.NewPacket(b, golayers.LayerTypeEthernet, gopacket.Default)
+	udpLayer := packet.Layer(golayers.LayerTypeUDP)
+	if udpLayer != nil {
+		udp, _ := udpLayer.(*golayers.UDP)
+		fmt.Println("---------------------------------------------")
+		fmt.Println("[*] UDP - Message:", string(udp.BaseLayer.Payload))
+		fmt.Println("---------------------------------------------")
+	}
+}

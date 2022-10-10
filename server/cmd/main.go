@@ -75,8 +75,6 @@ func main() {
 			fmt.Println("error")
 			continue
 		}
-
-		// Packetを判断する
 		internal.RoutineReceiveIncoming(buf, size, sd4soc)
 	}
 
