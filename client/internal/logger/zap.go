@@ -52,7 +52,7 @@ func InitZap() {
 // setFile return the location where the log file will be placed.
 func setFile() (f *os.File) {
 	dirPath := "/var/log"
-	fileName := "noded.json"
+	fileName := "client.json"
 	content := filepath.Join(dirPath, fileName)
 
 	if _, err := os.Stat(content); err != nil {
