@@ -73,6 +73,8 @@ func SendEtherPacket(fd int, b []byte) error {
 ## 🤝 Requirement 
 - **⚠️WARNING**：https://docs.docker.com/desktop/previous-versions/3.x-mac/#new-9
 
+> First version of docker compose (as an alternative to the existing docker-compose). Supports some basic commands but not the complete functionality of docker-compose yet.
+
 | Languages / Frameworks | Version |
 | :--- | ---: |
 | Golang | 1.19.1 |
