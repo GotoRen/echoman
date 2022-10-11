@@ -76,7 +76,7 @@ func SendEtherPacket(fd int, b []byte) error {
 | Golang | 1.19.1 |
 | Docker Desktop | 4.12.0 |
 | docker | 20.10.17 |
-| docker-compose Desktop | 1.29.2 |
+| docker-compose | 1.29.2 |
 
 ## 🚀 Usage
 ```sh
