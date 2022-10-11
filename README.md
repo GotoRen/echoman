@@ -71,6 +71,8 @@ func SendEtherPacket(fd int, b []byte) error {
 ```
 
 ## 🤝 Requirement 
+- **⚠️WARNING**：https://docs.docker.com/desktop/previous-versions/3.x-mac/#new-9
+
 | Languages / Frameworks | Version |
 | :--- | ---: |
 | Golang | 1.19.1 |
