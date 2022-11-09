@@ -9,18 +9,11 @@ import (
 )
 
 type Peer struct {
-	PeerIPv4    net.IP
-	PeerMAC     net.HardwareAddr
-	PeerUDPPort uint16
+	PeerEndPoint net.UDPAddr
 }
 
 func GerPeerInfo() (peer *Peer) {
 	peerIPv4addr := net.ParseIP(os.Getenv("PEER_IPV4_ADDRESS"))
-
-	peerMACaddr, err := net.ParseMAC(os.Getenv("PEER_MAC_ADDRESS"))
-	if err != nil {
-		logger.LogErr("MAC address parse error", "error", err)
-	}
 
 	peerUDPport, err := strconv.Atoi(os.Getenv("PEER_UDP_PORT"))
 	if err != nil {
@@ -28,9 +21,10 @@ func GerPeerInfo() (peer *Peer) {
 	}
 
 	peer = &Peer{
-		PeerIPv4:    peerIPv4addr,
-		PeerMAC:     peerMACaddr,
-		PeerUDPPort: uint16(peerUDPport),
+		PeerEndPoint: net.UDPAddr{
+			IP:   peerIPv4addr,
+			Port: peerUDPport,
+		},
 	}
 
 	return peer

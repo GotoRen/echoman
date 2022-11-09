@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"syscall"
 
 	"github.com/joho/godotenv"
 
@@ -28,23 +27,32 @@ func main() {
 	fmt.Println("[INFO] Peer IPv4 Address:", device.Peer.PeerIPv4)
 	fmt.Println("[INFO] Peer Hardware Address:", device.Peer.PeerMAC)
 
-	device.CreateDescriptor()
-	defer syscall.Close(device.Sd4soc)
-	defer syscall.Close(device.Rv4soc)
+	device.CreateTunInterface() // create tun interface
+	// device.ListenServer()        // echoman server listen
+	device.CreateUDPConnection() // Create connection with Peer node (echoman client)
+	// device.CreateDescriptor()
+	// defer syscall.Close(device.Sd4soc)
+	// defer syscall.Close(device.Rv4soc)
 
-	device.ListenServer()
-
+	// for {
+	// 	fmt.Println("hoge")
+	// 	go
+	// }
+	go device.RoutineReceiveIncoming()
 	for {
-		buf := make([]byte, 1500)
-		size, _, err := syscall.Recvfrom(device.Rv4soc, buf, 0)
-		if err != nil {
-			fmt.Println("[ERROR] Failed to read packet:", err)
-		}
-		if size < 8 {
-			fmt.Println("error")
-			continue
-		}
 
-		device.RoutineReceiveIncoming(buf, size, device.Sd4soc)
 	}
+	// for {
+	// 	buf := make([]byte, 1500)
+	// 	size, _, err := syscall.Recvfrom(device.Rv4soc, buf, 0)
+	// 	if err != nil {
+	// 		fmt.Println("[ERROR] Failed to read packet:", err)
+	// 	}
+	// 	if size < 8 {
+	// 		fmt.Println("error")
+	// 		continue
+	// 	}
+
+	// 	device.RoutineReceiveIncoming(buf, size, device.Sd4soc)
+	// }
 }

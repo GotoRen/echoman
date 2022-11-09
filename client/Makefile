@@ -8,7 +8,7 @@ GODOC=$(GOCMD)doc
 GOLANGCI=golangci-lint
 DUMPCMD=tcpdump
 
-INTERFACE=eth0
+INTERFACE=echoman_tun
 
 
 
