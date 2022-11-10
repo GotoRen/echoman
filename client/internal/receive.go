@@ -1,5 +1,3 @@
-// Package internal contains the TCP/UDP connection,
-// setups TUN/TAP Device, handles DNS packets.
 package internal
 
 import (
@@ -10,10 +8,11 @@ import (
 	"golang.org/x/net/ipv6"
 )
 
-func (device *Device) RoutineSequentialSender() {
+// 実インターフェースから取得したピアのパケットを仮想インフェースにフォワードします。
+func (device *Device) RoutineSequentialReceiver() {
 	for {
 		buf := make([]byte, 1500)
-		size, err := device.Tun.Device.Read(buf)
+		size, _, err := device.Peer.ConnUDP.ReadFrom(buf)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -30,11 +29,11 @@ func (device *Device) RoutineSequentialSender() {
 				buf = nil
 				continue
 			}
-			// fmt.Println("[DEBUG] Received IPv4 packet from TUN/TAP", buf[:size])
 			// dst := buf[layers.IPv4offsetDst : layers.IPv4offsetDst+net.IPv4len]
+			// fmt.Println("[INFO] Peer IPv4 Address", dst)
 
-			if _, err := device.Peer.ConnUDP.WriteToUDP(buf, &device.Peer.PeerEndPoint); err != nil {
-				logger.LogErr("Failed to write to real interface", "error", err)
+			if _, err := device.Tun.Device.Tun.Write(buf); err != nil {
+				logger.LogErr("Failed to write to tun/tap interface", "error", err)
 			}
 
 		case ipv6.Version:
@@ -43,11 +42,11 @@ func (device *Device) RoutineSequentialSender() {
 				buf = nil
 				continue
 			}
-			// fmt.Println("[DEBUG] Received IPv6 packet from TUN/TAP", buf[:size])
 			// dst := buf[layers.IPv6offsetDst : layers.IPv6offsetDst+net.IPv6len]
+			// fmt.Println("[INFO] Peer IPv6 Address", dst)
 
-			if _, err := device.Peer.ConnUDP.WriteToUDP(buf, &device.Peer.PeerEndPoint); err != nil {
-				logger.LogErr("Failed to write virtual IPv6 Packet", "error", err)
+			if _, err := device.Tun.Device.Tun.Write(buf); err != nil {
+				logger.LogErr("Failed to write to tun/tap interface", "error", err)
 			}
 
 		default:

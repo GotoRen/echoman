@@ -1,37 +1,31 @@
 package internal
 
-import (
-	"net"
+// func portConf(lp uint16) (*net.UDPConn, error) {
+// 	udpAddr := &net.UDPAddr{
+// 		IP:   net.IPv4zero.To4(),
+// 		Port: int(lp),
+// 	}
 
-	"github.com/GotoRen/echoman/client/internal/logger"
-)
+// 	c, err := net.ListenUDP("udp4", udpAddr)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-func portConf(lp uint16) (*net.UDPConn, error) {
-	udpAddr := &net.UDPAddr{
-		IP:   net.IPv4zero.To4(),
-		Port: int(lp),
-	}
+// 	return c, nil
+// }
 
-	c, err := net.ListenUDP("udp4", udpAddr)
-	if err != nil {
-		return nil, err
-	}
+// func listenUDPPort(c *net.UDPConn) {
+// 	buf := make([]byte, 1500)
+// 	for {
+// 		_, _ = c.Read(buf)
+// 	}
+// }
 
-	return c, nil
-}
+// func (device *Device) ListenClient() {
+// 	conn, err := portConf(device.LocalUDPPort)
+// 	if err != nil {
+// 		logger.LogErr("Failed to create connection", "error", err)
+// 	}
 
-func listenUDPPort(c *net.UDPConn) {
-	buf := make([]byte, 1500)
-	for {
-		_, _ = c.Read(buf)
-	}
-}
-
-func (device *Device) ListenClient() {
-	conn, err := portConf(device.LocalUDPPort)
-	if err != nil {
-		logger.LogErr("Failed to create connection", "error", err)
-	}
-
-	go listenUDPPort(conn)
-}
+// 	go listenUDPPort(conn)
+// }

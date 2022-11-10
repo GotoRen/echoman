@@ -1,5 +1,3 @@
-// Package internal contains the TCP/UDP connection,
-// setups TUN/TAP Device, handles DNS packets.
 package internal
 
 import (

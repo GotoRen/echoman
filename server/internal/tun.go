@@ -25,7 +25,6 @@ func NewTunInterface(name string, address string, prefix string) (*TunInterface,
 
 	switch runtime.GOOS {
 	case "linux":
-		fmt.Println("runtime.GOOS:", runtime.GOOS)
 		config := water.Config{
 			DeviceType: water.TUN,
 		}
@@ -33,8 +32,6 @@ func NewTunInterface(name string, address string, prefix string) (*TunInterface,
 
 		ifce, err := water.New(config)
 		if err != nil {
-			logger.LogErr("Unable to create TUN/TAP interface", "error", err)
-
 			return nil, err
 		}
 
@@ -46,13 +43,10 @@ func NewTunInterface(name string, address string, prefix string) (*TunInterface,
 		return iface, nil
 
 	case "darwin":
-		fmt.Println("runtime.GOOS:", runtime.GOOS)
 		ifce, err := water.New(water.Config{
 			DeviceType: water.TUN,
 		})
 		if err != nil {
-			logger.LogErr("Unable to create TUN/TAP interface", "error", err)
-
 			return nil, err
 		}
 
@@ -72,38 +66,30 @@ func NewTunInterface(name string, address string, prefix string) (*TunInterface,
 
 // Up function ups a virtual interface.
 func (iface *TunInterface) Up() error {
-	fmt.Println("[DEBUG] iface:", iface)
 	switch runtime.GOOS {
 	case "linux":
-		fmt.Println("runtime.GOOS:", runtime.GOOS)
 		out, err := execCmd("ip", []string{"addr", "add", iface.address, "dev", iface.Tun.Name()})
 		logger.LogDebug("Add a Virtual Interface", "Virtual Interface", out)
 
 		if err != nil {
 			logger.LogErr("ip command add fail", "error", err)
-
 			return err
 		}
 
 		set, err := execCmd("ip", []string{"link", "set", "dev", iface.Tun.Name(), "up", "mtu", "1368"})
 		logger.LogDebug("Up a Virtual Interface", "Virtual Interface", set)
-		fmt.Println("[DEBUG] iface address:", set)
 
 		if err != nil {
 			logger.LogErr("ip command set fail", "error", err)
-
 			return err
 		}
 
 	case "darwin":
-		fmt.Println("runtime.GOOS:", runtime.GOOS)
-		fmt.Println("runtime.GOOS:", runtime.GOOS)
 		out, err := execCmd("ifconfig", []string{iface.Tun.Name(), "up"})
-		logger.LogDebug("Up a Virtual Interface", "Virtual Interface", out)
+		logger.LogDebug("Add a Virtual Interface", "Virtual Interface", out)
 
 		if err != nil {
 			logger.LogErr("ifconfig fail", "error", err)
-
 			return err
 		}
 
@@ -116,6 +102,7 @@ func (iface *TunInterface) Up() error {
 			if err := netlink.AddrAdd(tun, addr); err != nil {
 				logger.LogErr("Unable to add IP address to linked device", "error", err)
 			}
+
 			// TODO: Change MTU
 
 			logger.LogDebug("Check Virtual Interface Name", "Virtual Interface Name", iface.Tun.Name())
@@ -137,7 +124,6 @@ func (iface *TunInterface) Read(buf []byte) (int, error) {
 	// Read Virtual Interface.
 	if err != nil {
 		logger.LogErr("Failed to read virtual interface", "error", err)
-
 		return 0, err
 	}
 
@@ -156,6 +142,7 @@ func (iface *TunInterface) Close() {
 	}
 }
 
+// execCmd executes the given arguments as a command.
 func execCmd(cmd string, args []string) (string, error) {
 	execCmd := exec.Command(cmd, args...)
 	if err := execCmd.Run(); err != nil {

@@ -3,8 +3,8 @@ module github.com/GotoRen/echoman/server
 go 1.19
 
 require (
-	github.com/GotoRen/echoman/client v0.0.0-20221011163549-b2357ee22544
 	github.com/google/gopacket v1.1.19
+	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
 	github.com/songgao/water v0.0.0-20200317203138-2b4b6d7c09d8
 	github.com/vishvananda/netlink v1.1.0

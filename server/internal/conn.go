@@ -1,25 +1,19 @@
 package internal
 
 import (
-	"fmt"
 	"net"
 	"strconv"
-
-	"github.com/GotoRen/echoman/server/internal/logger"
 )
 
 // makeUDPConnection makes UDP Connection.
-func makeUDPConnection(dstPort uint16) (connUDP *net.UDPConn, err error) {
-	fmt.Println("[DEBUG] Peer UDP port:", strconv.Itoa(int(dstPort)))
-	udpAddr, err := net.ResolveUDPAddr("udp", ":"+strconv.Itoa(int(dstPort)))
+func makeUDPConnection(dstPort int) (connUDP *net.UDPConn, err error) {
+	udpAddr, err := net.ResolveUDPAddr("udp", ":"+strconv.Itoa(dstPort))
 	if err != nil {
-		logger.LogErr("Unable to return the address of the UDP endpoint", "error", err)
 		return nil, err
 	}
 
 	connUDP, err = net.ListenUDP("udp", udpAddr)
 	if err != nil {
-		logger.LogErr("Unable to establish UDP connection", "error", err)
 		return nil, err
 	}
 
@@ -27,12 +21,11 @@ func makeUDPConnection(dstPort uint16) (connUDP *net.UDPConn, err error) {
 }
 
 // CreateUDPConnection creates a UDP connection with the peer node.
-func (device *Device) CreateUDPConnection() {
-	connUDP, err := makeUDPConnection(device.Peer.PeerUDPPort)
+func CreateUDPConnection(peerUDPport int) (*net.UDPConn, error) {
+	connUDP, err := makeUDPConnection(peerUDPport)
 	if err != nil {
-		logger.LogErr("Unable to establish UDP connection", "error", err)
-	} else {
-		fmt.Println("Create UDP connection.")
+		return nil, err
 	}
-	device.ConnUDP = connUDP
+
+	return connUDP, nil
 }

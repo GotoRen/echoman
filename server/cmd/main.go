@@ -4,55 +4,27 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/joho/godotenv"
-
+	"github.com/GotoRen/echoman/server/exec"
 	"github.com/GotoRen/echoman/server/internal"
-	"github.com/GotoRen/echoman/server/internal/logger"
 )
 
-func init() {
-	err := godotenv.Load()
-	if err != nil {
-		logger.LogErr("Error loading .env file", "error", err)
-	}
-}
-
 func main() {
-	logger.InitZap()
+	exec.Run()
 
-	device := internal.GetDeviceInfo(os.Getenv("LOCAL_INTERFACE"))
-	fmt.Println("[INFO] Local Interface Information:", device.IfIndex)
-	fmt.Println("[INFO] Local IPv4 Address:", device.LocalIPv4)
-	fmt.Println("[INFO] Local Hardware Address:", device.LocalMAC)
-	fmt.Println("[INFO] Peer IPv4 Address:", device.Peer.PeerIPv4)
-	fmt.Println("[INFO] Peer Hardware Address:", device.Peer.PeerMAC)
+	device := internal.NewDevice(os.Getenv("LOCAL_INTERFACE"))
+	fmt.Println("[INFO] IP version:", device.EnvIPver)
+	fmt.Println("[INFO] Local IPv4:", device.LocalIPv4)
 
-	device.CreateTunInterface() // create tun interface
-	// device.ListenServer()        // echoman server listen
-	device.CreateUDPConnection() // Create connection with Peer node (echoman client)
-	// device.CreateDescriptor()
-	// defer syscall.Close(device.Sd4soc)
-	// defer syscall.Close(device.Rv4soc)
+	device.NewPeer()
 
-	// for {
-	// 	fmt.Println("hoge")
-	// 	go
-	// }
-	go device.RoutineReceiveIncoming()
+	device.CreateTunInterface()
+	fmt.Println("[INFO] Peer IPv4:", device.Peer.PeerEndPoint.IP)
+	fmt.Println("[INFO] Peer UDP port:", device.Peer.PeerEndPoint.Port)
+
+	go device.RoutineSequentialReceiver()
+	go device.RoutineSequentialSender()
+
 	for {
-
+		// make the main routine wait
 	}
-	// for {
-	// 	buf := make([]byte, 1500)
-	// 	size, _, err := syscall.Recvfrom(device.Rv4soc, buf, 0)
-	// 	if err != nil {
-	// 		fmt.Println("[ERROR] Failed to read packet:", err)
-	// 	}
-	// 	if size < 8 {
-	// 		fmt.Println("error")
-	// 		continue
-	// 	}
-
-	// 	device.RoutineReceiveIncoming(buf, size, device.Sd4soc)
-	// }
 }

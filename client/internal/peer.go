@@ -9,10 +9,15 @@ import (
 )
 
 type Peer struct {
+	// Network information
 	PeerEndPoint net.UDPAddr
+
+	// UDP connection
+	ConnUDP *net.UDPConn
 }
 
-func GerPeerInfo() (peer *Peer) {
+// NewPeer creates peer network information and UDP connections.
+func (device *Device) NewPeer() {
 	peerIPv4addr := net.ParseIP(os.Getenv("PEER_IPV4_ADDRESS"))
 
 	peerUDPport, err := strconv.Atoi(os.Getenv("PEER_UDP_PORT"))
@@ -20,12 +25,16 @@ func GerPeerInfo() (peer *Peer) {
 		logger.LogErr("Type conversion failed", "error", err)
 	}
 
-	peer = &Peer{
+	connUDP, err := CreateUDPConnection(peerUDPport)
+	if err != nil {
+		logger.LogErr("Unable to establish UDP connection", "error", err)
+	}
+
+	device.Peer = &Peer{
 		PeerEndPoint: net.UDPAddr{
 			IP:   peerIPv4addr,
 			Port: peerUDPport,
 		},
+		ConnUDP: connUDP,
 	}
-
-	return peer
 }
