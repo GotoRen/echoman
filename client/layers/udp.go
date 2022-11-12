@@ -18,7 +18,7 @@ const (
 )
 
 func UnmarshalUDPPacket(b []byte) {
-	packet := gopacket.NewPacket(b, golayers.LayerTypeEthernet, gopacket.Default)
+	packet := gopacket.NewPacket(b, golayers.LayerTypeIPv4, gopacket.Default)
 	udpLayer := packet.Layer(golayers.LayerTypeUDP)
 	if udpLayer != nil {
 		udp, _ := udpLayer.(*golayers.UDP)
@@ -34,7 +34,7 @@ func UnmarshalUDPPacket(b []byte) {
 }
 
 func DebugUDPMessage(b []byte) {
-	packet := gopacket.NewPacket(b, golayers.LayerTypeEthernet, gopacket.Default)
+	packet := gopacket.NewPacket(b, golayers.LayerTypeIPv4, gopacket.Default)
 	udpLayer := packet.Layer(golayers.LayerTypeUDP)
 	if udpLayer != nil {
 		udp, _ := udpLayer.(*golayers.UDP)

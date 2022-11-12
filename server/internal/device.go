@@ -1,11 +1,11 @@
 package internal
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/GotoRen/echoman/server/internal/logger"
 )
@@ -14,14 +14,18 @@ type Device struct {
 	EnvIPver int
 
 	// Real Interface
-	IfIndex   *net.Interface
-	LocalIPv4 net.IP
-	LocalIPv6 net.IP
-	LocalMAC  net.HardwareAddr
+	IfIndex      *net.Interface
+	LocalIPv4    net.IP
+	LocalIPv6    net.IP
+	LocalUDPPort uint16
+
+	Sd4soc int // IPv4 send socket for sending any packets to TUN/TAP
+	Rv4soc int // IPv4 receive socket for receiving any packets to TUN/TAP
 
 	// TUN/TAP Interface
 	Tun struct {
 		Device *TunInterface
+		VIP    string
 		mtu    int32
 	}
 
@@ -74,5 +78,11 @@ func (device *Device) CreateTunInterface() {
 		logger.LogErr("Failed to Tunnel up", "error", err)
 	}
 
-	fmt.Println("[INFO] TUN IPv4:", device.Tun.Device.address)
+	device.Tun.VIP = device.Tun.Device.address[:strings.Index(device.Tun.Device.address, "/")]
+}
+
+// Close closes device's queue, workers.
+func (device *Device) Close() {
+	device.CloseRawSocket()
+	logger.LogDebug("Device closed")
 }

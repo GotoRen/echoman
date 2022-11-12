@@ -1,4 +1,4 @@
-package internal
+package mock
 
 // func (device *Device) NewICMPv4Packet() []byte {
 // 	ether := golayers.Ethernet{

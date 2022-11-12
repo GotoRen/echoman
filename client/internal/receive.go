@@ -4,17 +4,19 @@ import (
 	"fmt"
 
 	"github.com/GotoRen/echoman/client/internal/logger"
+	"github.com/GotoRen/echoman/client/layers"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
 )
 
-// 実インターフェースから取得したピアのパケットを仮想インフェースにフォワードします。
+// RoutineSequentialReceiver forwards the peer's packets obtained from
+// the real interface to the virtual interface.
 func (device *Device) RoutineSequentialReceiver() {
 	for {
 		buf := make([]byte, 1500)
 		size, _, err := device.Peer.ConnUDP.ReadFrom(buf)
 		if err != nil {
-			fmt.Println(err)
+			logger.LogErr("Failed to receive UDP packet", "error", err)
 		}
 
 		if size == 0 {
@@ -31,6 +33,8 @@ func (device *Device) RoutineSequentialReceiver() {
 			}
 			// dst := buf[layers.IPv4offsetDst : layers.IPv4offsetDst+net.IPv4len]
 			// fmt.Println("[INFO] Peer IPv4 Address", dst)
+
+			layers.DebugUDPMessage(buf) // Receive debug
 
 			if _, err := device.Tun.Device.Tun.Write(buf); err != nil {
 				logger.LogErr("Failed to write to tun/tap interface", "error", err)

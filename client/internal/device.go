@@ -1,11 +1,11 @@
 package internal
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/GotoRen/echoman/client/internal/logger"
 )
@@ -14,13 +14,17 @@ type Device struct {
 	EnvIPver int
 
 	// Real Interface
-	IfIndex   *net.Interface
-	LocalIPv4 net.IP
-	LocalIPv6 net.IP
+	IfIndex      *net.Interface
+	LocalIPv4    net.IP
+	LocalIPv6    net.IP
+	LocalUDPPort uint16
+
+	Sd4soc int // IPv4 send socket for sending any packets to TUN/TAP
 
 	// TUN/TAP Interface
 	Tun struct {
 		Device *TunInterface
+		VIP    string
 		mtu    int32
 	}
 
@@ -44,9 +48,15 @@ func NewDevice(intf string) (device *Device) {
 		logger.LogErr("IPv4 address is empty", "error", err)
 	}
 
+	localUDPport, err := strconv.Atoi(os.Getenv("LOCAL_UDP_PORT"))
+	if err != nil {
+		logger.LogErr("Type conversion failed", "error", err)
+	}
+
 	device = &Device{
-		EnvIPver:  envIPVer,
-		LocalIPv4: localIPv4addr,
+		EnvIPver:     envIPVer,
+		LocalIPv4:    localIPv4addr,
+		LocalUDPPort: uint16(localUDPport),
 	}
 
 	return device
@@ -76,5 +86,11 @@ func (device *Device) CreateTunInterface() {
 		logger.LogErr("Failed to Tunnel up", "error", err)
 	}
 
-	fmt.Println("[INFO] TUN IPv4:", device.Tun.Device.address)
+	device.Tun.VIP = device.Tun.Device.address[:strings.Index(device.Tun.Device.address, "/")]
+}
+
+// Close closes device's queue, workers.
+func (device *Device) Close() {
+	device.CloseRawSocket()
+	logger.LogDebug("Device closed")
 }

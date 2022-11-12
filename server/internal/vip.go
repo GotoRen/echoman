@@ -16,6 +16,7 @@ import (
 var VIPv4NetworkAddress string = "198.18.0.0/16"
 var VIPv6NetworkAddress string = "2001:0db8:c0ff:ee00::/64"
 
+// getVIPv4NetworkAddressInfo returns information about virtual IPv4 overlay network.
 func getVIPv4NetworkAddressInfo() (vipv4nwaddress net.IP, vipv4netmask net.IPMask, vipv4prefix string) {
 	_, ipnet, err := net.ParseCIDR(VIPv4NetworkAddress)
 	if err != nil {
@@ -29,6 +30,7 @@ func getVIPv4NetworkAddressInfo() (vipv4nwaddress net.IP, vipv4netmask net.IPMas
 	return
 }
 
+// getVIPv6NetworkAddressInfo returns information about virtual IPv6 overlay network.
 func getVIPv6NetworkAddressInfo() (vipv6nwaddress net.IP, vipv6netmask net.IPMask, vipv6prefix string) {
 	_, ipnet, err := net.ParseCIDR(VIPv6NetworkAddress)
 	if err != nil {

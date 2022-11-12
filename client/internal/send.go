@@ -1,21 +1,19 @@
-// Package internal contains the TCP/UDP connection,
-// setups TUN/TAP Device, handles DNS packets.
 package internal
 
 import (
-	"fmt"
-
 	"github.com/GotoRen/echoman/client/internal/logger"
+	"github.com/GotoRen/echoman/client/layers"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
 )
 
+// RoutineSequentialSender sends packets obtained from a virtual interface to the peer.
 func (device *Device) RoutineSequentialSender() {
 	for {
 		buf := make([]byte, 1500)
 		size, err := device.Tun.Device.Read(buf)
 		if err != nil {
-			fmt.Println(err)
+			logger.LogErr("Failed to receive virtual IP packet", "error", err)
 		}
 
 		if size == 0 {
@@ -32,6 +30,8 @@ func (device *Device) RoutineSequentialSender() {
 			}
 			// fmt.Println("[DEBUG] Received IPv4 packet from TUN/TAP", buf[:size])
 			// dst := buf[layers.IPv4offsetDst : layers.IPv4offsetDst+net.IPv4len]
+
+			layers.DebugUDPMessage(buf) // Send debug
 
 			if _, err := device.Peer.ConnUDP.WriteToUDP(buf, &device.Peer.PeerEndPoint); err != nil {
 				logger.LogErr("Failed to write to real interface", "error", err)
@@ -51,7 +51,7 @@ func (device *Device) RoutineSequentialSender() {
 			}
 
 		default:
-			fmt.Println("ip version error")
+			logger.LogErr("ip version error", "error", buf[0]>>4)
 		}
 	}
 }

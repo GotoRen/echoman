@@ -54,7 +54,7 @@ const (
 )
 
 func UnmarshalIPv4Packet(b []byte) {
-	packet := gopacket.NewPacket(b, golayers.LayerTypeEthernet, gopacket.Default)
+	packet := gopacket.NewPacket(b, golayers.LayerTypeIPv4, gopacket.Default)
 	ipv4Layer := packet.Layer(golayers.LayerTypeIPv4)
 	if ipv4Layer != nil {
 		ipv4, _ := ipv4Layer.(*golayers.IPv4)

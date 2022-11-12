@@ -1,5 +1,3 @@
-// Package internal contains the TCP/UDP connection,
-// setups TUN/TAP Device, handles DNS packets.
 package internal
 
 import (
@@ -76,7 +74,7 @@ func (iface *TunInterface) Up() error {
 			return err
 		}
 
-		set, err := execCmd("ip", []string{"link", "set", "dev", iface.Tun.Name(), "up", "mtu", "1368"})
+		set, err := execCmd("ip", []string{"link", "set", "dev", iface.Tun.Name(), "up", "mtu", "1460"})
 		logger.LogDebug("Up a Virtual Interface", "Virtual Interface", set)
 
 		if err != nil {

@@ -12,7 +12,7 @@ services:
     privileged: true
     restart: always
     sysctls:
-      net.ipv6.conf.all.disable_ipv6: "1"
+      net.ipv6.conf.all.disable_ipv6: "1" # enable
     tty: true
     volumes:
       - type: bind
@@ -33,7 +33,7 @@ services:
     privileged: true
     restart: always
     sysctls:
-      net.ipv6.conf.all.disable_ipv6: "1"
+      net.ipv6.conf.all.disable_ipv6: "1" # enable
     tty: true
     volumes:
       - type: bind
@@ -49,5 +49,5 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 10.0.3.0/24
+        - subnet: 10.0.3.0/22
     enable_ipv6: false
