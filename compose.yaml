@@ -9,10 +9,11 @@ services:
     networks:
       echoman:
         ipv4_address: 10.0.3.95
+        ipv6_address: fde4:db8::0395
     privileged: true
     restart: always
     sysctls:
-      net.ipv6.conf.all.disable_ipv6: "1" # enable
+      net.ipv6.conf.all.disable_ipv6: "0" # enable
     tty: true
     volumes:
       - type: bind
@@ -30,10 +31,11 @@ services:
     networks:
       echoman:
         ipv4_address: 10.0.3.96
+        ipv6_address: fde4:db8::0396
     privileged: true
     restart: always
     sysctls:
-      net.ipv6.conf.all.disable_ipv6: "1" # enable
+      net.ipv6.conf.all.disable_ipv6: "0" # enable
     tty: true
     volumes:
       - type: bind
@@ -50,4 +52,5 @@ networks:
     ipam:
       config:
         - subnet: 10.0.3.0/22
-    enable_ipv6: false
+        - subnet: fde4:db8::/8
+    enable_ipv6: true
