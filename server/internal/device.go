@@ -19,8 +19,9 @@ type Device struct {
 	LocalIPv6    net.IP
 	LocalUDPPort uint16
 
-	Sd4soc int // IPv4 send socket for sending any packets to TUN/TAP
-	Rv4soc int // IPv4 receive socket for receiving any packets to TUN/TAP
+	socket struct {
+		sd4soc int // IPv4 send socket for sending any packets to TUN/TAP
+	}
 
 	// TUN/TAP Interface
 	Tun struct {
@@ -28,6 +29,8 @@ type Device struct {
 		VIP    string
 		mtu    int32
 	}
+
+	ChorusPort int
 
 	Peer *Peer
 }
@@ -81,8 +84,8 @@ func (device *Device) CreateTunInterface() {
 	device.Tun.VIP = device.Tun.Device.address[:strings.Index(device.Tun.Device.address, "/")]
 }
 
-// Close closes device's queue, workers.
-func (device *Device) Close() {
-	device.CloseRawSocket()
-	logger.LogDebug("Device closed")
-}
+// // Close closes device's queue, workers.
+// func (device *Device) Close() {
+// 	device.CloseRawSocket()
+// 	logger.LogDebug("Device closed")
+// }

@@ -23,8 +23,8 @@ func GenerateUDPPacket(device *internal.Device) ([]byte, error) {
 	}
 
 	udp := golayers.UDP{
-		SrcPort: golayers.UDPPort(30005), // For application src test ports
-		DstPort: golayers.UDPPort(30005), // For application dst test ports
+		SrcPort: golayers.UDPPort(30910), // For application src test ports
+		DstPort: golayers.UDPPort(30910), // For application dst test ports
 	}
 
 	// calculating checksum

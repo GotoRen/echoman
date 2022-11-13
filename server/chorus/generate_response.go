@@ -1,8 +1,7 @@
-package app
+package chorus
 
 import (
 	"encoding/binary"
-	"fmt"
 
 	"github.com/GotoRen/echoman/server/internal/logger"
 	"github.com/GotoRen/echoman/server/layers"
@@ -26,10 +25,10 @@ func GenerateUDPResponsePacket(req []byte) []byte {
 		DstIP:    dstIPv4Addr,
 	}
 
-	fmt.Println("srcIPv4Addr:", srcIPv4Addr)
-	fmt.Println("dstIPv4Addr:", dstIPv4Addr)
-	fmt.Println("srcPort:", srcPort)
-	fmt.Println("dstPort:", dstPort)
+	// fmt.Println("[DEBUG] srcIPv4Addr:", srcIPv4Addr)
+	// fmt.Println("[DEBUG] dstIPv4Addr:", dstIPv4Addr)
+	// fmt.Println("[DEBUG] srcPort:", srcPort)
+	// fmt.Println("[DEBUG] dstPort:", dstPort)
 
 	udp := golayers.UDP{
 		SrcPort: golayers.UDPPort(srcPort),
