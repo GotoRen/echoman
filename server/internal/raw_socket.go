@@ -77,6 +77,7 @@ func RecvEtherPacket(fd int, b []byte) error {
 // ========================================================================= //
 // L3 socket
 // ========================================================================= //
+
 // SendIPv4RawSocket creates a raw socket for sending IPv4 packet.
 func SendIPv4RawSocket(dip string) (int, error) {
 	fd, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_RAW, syscall.IPPROTO_RAW)
@@ -144,6 +145,7 @@ func RecvPacket4(fd int, b []byte, sip []byte) error {
 // ========================================================================= //
 // Socket controller
 // ========================================================================= //
+
 // closeRawSocket closes opening file descriptor.
 func closeRawSocket(fd int, fdType string) {
 	if fd == -1 {
