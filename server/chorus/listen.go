@@ -12,7 +12,7 @@ func portConf(li string, lp int) (*net.UDPConn, error) {
 		Port: lp,
 	}
 
-	c, err := net.ListenUDP("udp4", udpAddr)
+	c, err := net.ListenUDP("udp", udpAddr)
 	if err != nil {
 		return nil, err
 	}

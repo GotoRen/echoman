@@ -41,11 +41,6 @@ const (
 	DstIPv4Length = 4
 )
 
-// const (
-// 	SrcIPv4AddrOffset = 26
-// 	DstIPv4AddrOffset = 30
-// )
-
 // IPv4 offset length.
 const (
 	IPv4offsetTotalLength = 2                           // IPv4offsetPayloadLength is IPv4 offset payload length.

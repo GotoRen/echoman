@@ -9,10 +9,11 @@ import (
 	golayers "github.com/google/gopacket/layers"
 )
 
+// GenerateUDPResponsePacket generate response packet for received UDP packets.
 func GenerateUDPResponsePacket(req []byte) []byte {
 	data := []byte("Pong")
 
-	// ここで送信元と宛先の情報を入れ替える
+	// swap source and destination information
 	srcIPv4Addr := req[layers.IPv4offsetDst : layers.IPv4offsetDst+layers.DstIPv4Length]
 	dstIPv4Addr := req[layers.IPv4offsetSrc : layers.IPv4offsetSrc+layers.SrcIPv4Length]
 	srcPort := binary.BigEndian.Uint16(req[layers.DstUDPPortOffset : layers.DstUDPPortOffset+layers.DstUDPLength])
@@ -25,15 +26,15 @@ func GenerateUDPResponsePacket(req []byte) []byte {
 		DstIP:    dstIPv4Addr,
 	}
 
-	// fmt.Println("[DEBUG] srcIPv4Addr:", srcIPv4Addr)
-	// fmt.Println("[DEBUG] dstIPv4Addr:", dstIPv4Addr)
-	// fmt.Println("[DEBUG] srcPort:", srcPort)
-	// fmt.Println("[DEBUG] dstPort:", dstPort)
-
 	udp := golayers.UDP{
 		SrcPort: golayers.UDPPort(srcPort),
 		DstPort: golayers.UDPPort(dstPort),
 	}
+
+	// fmt.Println("[DEBUG] srcIPv4Addr:", srcIPv4Addr)
+	// fmt.Println("[DEBUG] dstIPv4Addr:", dstIPv4Addr)
+	// fmt.Println("[DEBUG] srcPort:", srcPort)
+	// fmt.Println("[DEBUG] dstPort:", dstPort)
 
 	// calculating checksum
 	if err := udp.SetNetworkLayerForChecksum(&ip); err != nil {

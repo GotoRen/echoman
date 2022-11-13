@@ -2,9 +2,9 @@ package internal
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/GotoRen/echoman/server/internal/logger"
-	"github.com/GotoRen/echoman/server/layers"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
 )
@@ -17,9 +17,6 @@ func (device *Device) RoutineSequentialSender() {
 		if err != nil {
 			logger.LogErr("Failed to receive virtual IP packet", "error", err)
 		}
-
-		// fmt.Println("OK:", buf)
-		layers.DebugUDPMessage(buf)
 
 		if size == 0 {
 			logger.LogErr("Received packet is too small", "error", size)
@@ -55,6 +52,7 @@ func (device *Device) RoutineSequentialSender() {
 
 		default:
 			fmt.Println("ip version error")
+			os.Exit(1)
 		}
 	}
 }

@@ -19,10 +19,6 @@ type Device struct {
 	LocalIPv6    net.IP
 	LocalUDPPort uint16
 
-	socket struct {
-		sd4soc int // IPv4 send socket for sending any packets to TUN/TAP
-	}
-
 	// TUN/TAP Interface
 	Tun struct {
 		Device *TunInterface
@@ -83,9 +79,3 @@ func (device *Device) CreateTunInterface() {
 
 	device.Tun.VIP = device.Tun.Device.address[:strings.Index(device.Tun.Device.address, "/")]
 }
-
-// // Close closes device's queue, workers.
-// func (device *Device) Close() {
-// 	device.CloseRawSocket()
-// 	logger.LogDebug("Device closed")
-// }
