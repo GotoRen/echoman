@@ -23,6 +23,7 @@
 
 ## TUN/TAP を介したecho
 - ICMPv4
-<img src="./docs/img/icmpv4.png" alt="ICMPv4.png" width="280" height="400" />
+<img src="./img/icmpv4.png" alt="ICMPv4.png" />
+
 - UDPv4
-<img src="./docs/img/udpv4.png" alt="UDPv4.png" width="280" height="400" />
+<img src="./img/udpv4.png" alt="UDPv4.png" />
