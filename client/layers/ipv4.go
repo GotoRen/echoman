@@ -2,6 +2,7 @@ package layers
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/google/gopacket"
 	golayers "github.com/google/gopacket/layers"
@@ -40,13 +41,15 @@ const (
 	DstIPv4Length = 4
 )
 
+// IPv4 offset length.
 const (
-	SrcIPv4AddrOffset = 26
-	DstIPv4AddrOffset = 30
+	IPv4offsetTotalLength = 2                           // IPv4offsetPayloadLength is IPv4 offset payload length.
+	IPv4offsetSrc         = 12                          // IPv4offsetSrc is IPv4 offset src length.
+	IPv4offsetDst         = IPv4offsetSrc + net.IPv4len // IPv4offsetDst is IPv4 offset dst length.
 )
 
 func UnmarshalIPv4Packet(b []byte) {
-	packet := gopacket.NewPacket(b, golayers.LayerTypeEthernet, gopacket.Default)
+	packet := gopacket.NewPacket(b, golayers.LayerTypeIPv4, gopacket.Default)
 	ipv4Layer := packet.Layer(golayers.LayerTypeIPv4)
 	if ipv4Layer != nil {
 		ipv4, _ := ipv4Layer.(*golayers.IPv4)
