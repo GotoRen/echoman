@@ -19,6 +19,11 @@ type Device struct {
 	LocalIPv6    net.IP
 	LocalUDPPort uint16
 
+	socket struct {
+		sd4soc int
+		rv4soc int
+	}
+
 	// TUN/TAP Interface
 	Tun struct {
 		Device *TunInterface

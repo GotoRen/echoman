@@ -1,20 +1,18 @@
-package mock
+package chorus
 
 import (
 	"net"
-	"os"
-	"strconv"
 
 	"github.com/GotoRen/echoman/client/internal/logger"
 )
 
-func portConf(lp int) (*net.UDPConn, error) {
+func portConf(li string, lp int) (*net.UDPConn, error) {
 	udpAddr := &net.UDPAddr{
-		IP:   net.IPv4zero.To4(),
+		IP:   net.ParseIP(li),
 		Port: lp,
 	}
 
-	c, err := net.ListenUDP("udp4", udpAddr)
+	c, err := net.ListenUDP("udp", udpAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -29,13 +27,8 @@ func listenUDPPort(c *net.UDPConn) {
 	}
 }
 
-func Listen() {
-	appPort, err := strconv.Atoi(os.Getenv("TEST_APP_PORT"))
-	if err != nil {
-		logger.LogErr("Unable to get TEST_APP_PORT", "error", err)
-	}
-
-	conn, err := portConf(appPort)
+func Listen(appIP string, appPort int) {
+	conn, err := portConf(appIP, appPort)
 	if err != nil {
 		logger.LogErr("Failed to create connection", "error", err)
 	}

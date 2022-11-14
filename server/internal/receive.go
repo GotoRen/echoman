@@ -46,8 +46,8 @@ func (device *Device) RoutineSequentialReceiver() {
 				logger.LogErr("Failed to write to tun/tap interface", "error", err)
 			} else {
 				/*************************************************************************************
-				 * README: description for Chorus application *
-				*************************************************************************************
+				 * README: description for Chorus.app *
+				**************************************************************************************
 				 * Checking the TUN -> Application packet flow using source code is complicated.
 				 *   - For the time being, I will check with wireshark.app.
 				 * Thefore, if the write to TUN succeeds, we generate and return a response message.

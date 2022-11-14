@@ -41,16 +41,11 @@ const (
 	DstIPv4Length = 4
 )
 
-const (
-	SrcIPv4AddrOffset = 26
-	DstIPv4AddrOffset = 30
-)
-
 // IPv4 offset length.
 const (
 	IPv4offsetTotalLength = 2                           // IPv4offsetPayloadLength is IPv4 offset payload length.
-	IPv4offsetSrc         = 12                          // IPv4offsetSrc is IPv6 offset src length.
-	IPv4offsetDst         = IPv4offsetSrc + net.IPv4len // IPv4offsetDst is IPv6 offset dst length.
+	IPv4offsetSrc         = 12                          // IPv4offsetSrc is IPv4 offset src length.
+	IPv4offsetDst         = IPv4offsetSrc + net.IPv4len // IPv4offsetDst is IPv4 offset dst length.
 )
 
 func UnmarshalIPv4Packet(b []byte) {

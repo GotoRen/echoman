@@ -39,7 +39,7 @@ const (
 )
 
 func UnmarshalICMPv4Packet(b []byte) {
-	packet := gopacket.NewPacket(b, golayers.LayerTypeEthernet, gopacket.Default)
+	packet := gopacket.NewPacket(b, golayers.LayerTypeIPv4, gopacket.Default)
 	icmpv4Layer := packet.Layer(golayers.LayerTypeICMPv4)
 	if icmpv4Layer != nil {
 		icmpv4, _ := icmpv4Layer.(*golayers.ICMPv4)
@@ -54,7 +54,7 @@ func UnmarshalICMPv4Packet(b []byte) {
 }
 
 func DebugICMPv4Message(b []byte) {
-	packet := gopacket.NewPacket(b, golayers.LayerTypeEthernet, gopacket.Default)
+	packet := gopacket.NewPacket(b, golayers.LayerTypeIPv4, gopacket.Default)
 	icmpv4Layer := packet.Layer(golayers.LayerTypeICMPv4)
 	if icmpv4Layer != nil {
 		icmpv4, _ := icmpv4Layer.(*golayers.ICMPv4)

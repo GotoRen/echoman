@@ -1,8 +1,13 @@
 package internal
 
 import (
+	"net"
+	"os"
+
+	"github.com/GotoRen/echoman/client/chorus"
 	"github.com/GotoRen/echoman/client/internal/logger"
 	"github.com/GotoRen/echoman/client/layers"
+	golayers "github.com/google/gopacket/layers"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/net/ipv6"
 )
@@ -53,5 +58,22 @@ func (device *Device) RoutineSequentialSender() {
 		default:
 			logger.LogErr("ip version error", "error", buf[0]>>4)
 		}
+	}
+}
+
+// NewChorusUDPPacket sends the generated UDP packet.
+func (device *Device) NewChorusUDPPacket() {
+	srcVIPv4 := net.ParseIP(device.Tun.VIP).To4()
+	dstVIPv4 := net.ParseIP(os.Getenv("ECHOMAN_SERVER_IPV4_TUN")).To4()
+	chorusPort := golayers.UDPPort(device.ChorusPort)
+
+	udpPacket, err := chorus.GenerateUDPRequestPacket(srcVIPv4, dstVIPv4, chorusPort)
+	if err != nil {
+		logger.LogErr("Failed to generate udp packet", "error", err)
+	}
+
+	// write to the tun/tap interface
+	if err := SendPacket4(device.socket.sd4soc, udpPacket, dstVIPv4); err != nil {
+		logger.LogErr("Failed to write to tun/tap interface", "error", err)
 	}
 }

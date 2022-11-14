@@ -13,8 +13,8 @@ const (
 )
 
 const (
-	SrcUDPPortOffset = 34
-	DstUDPPortOffset = 36
+	SrcUDPPortOffset = 20
+	DstUDPPortOffset = 22
 )
 
 func UnmarshalUDPPacket(b []byte) {

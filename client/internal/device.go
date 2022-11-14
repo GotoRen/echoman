@@ -19,7 +19,10 @@ type Device struct {
 	LocalIPv6    net.IP
 	LocalUDPPort uint16
 
-	Sd4soc int // IPv4 send socket for sending any packets to TUN/TAP
+	socket struct {
+		sd4soc int
+		rv4soc int
+	}
 
 	// TUN/TAP Interface
 	Tun struct {
@@ -27,6 +30,8 @@ type Device struct {
 		VIP    string
 		mtu    int32
 	}
+
+	ChorusPort int
 
 	Peer *Peer
 }
@@ -48,15 +53,9 @@ func NewDevice(intf string) (device *Device) {
 		logger.LogErr("IPv4 address is empty", "error", err)
 	}
 
-	localUDPport, err := strconv.Atoi(os.Getenv("LOCAL_UDP_PORT"))
-	if err != nil {
-		logger.LogErr("Type conversion failed", "error", err)
-	}
-
 	device = &Device{
-		EnvIPver:     envIPVer,
-		LocalIPv4:    localIPv4addr,
-		LocalUDPPort: uint16(localUDPport),
+		EnvIPver:  envIPVer,
+		LocalIPv4: localIPv4addr,
 	}
 
 	return device
@@ -89,8 +88,26 @@ func (device *Device) CreateTunInterface() {
 	device.Tun.VIP = device.Tun.Device.address[:strings.Index(device.Tun.Device.address, "/")]
 }
 
+// CreateDescriptor creates socket descriptor.
+func (device *Device) CreateDescriptor() {
+	var err error
+
+	// send socket
+	device.socket.sd4soc, err = SendIPv4RawSocket(device.Tun.VIP)
+	if err != nil {
+		logger.LogErr("Failed to open send IPv4 raw socket", "error", err)
+	}
+
+	// receive socket
+	device.socket.rv4soc, err = RecvIPv4RawSocket(device.Tun.VIP)
+	if err != nil {
+		logger.LogErr("Failed to open receive IPv4 raw socket", "error", err)
+	}
+}
+
 // Close closes device's queue, workers.
 func (device *Device) Close() {
-	device.CloseRawSocket()
+	closeRawSocket(device.socket.sd4soc, "send IPv4")
+	closeRawSocket(device.socket.rv4soc, "receive IPv4")
 	logger.LogDebug("Device closed")
 }

@@ -1,9 +1,10 @@
 package internal
 
 import (
-	"log"
 	"net"
 	"syscall"
+
+	"github.com/GotoRen/echoman/server/internal/logger"
 )
 
 func htons(host uint16) uint16 {
@@ -153,6 +154,7 @@ func closeRawSocket(fd int, fdType string) {
 	}
 
 	if err := syscall.Close(fd); err != nil {
-		log.Fatal("Failed to close the "+fdType+" Raw socket:", err)
+		message := "Failed to close the " + fdType + " Raw socket"
+		logger.LogErr(message, "error", err)
 	}
 }
