@@ -130,19 +130,6 @@ func SendPacket4(fd int, b []byte, dip []byte) error {
 	return nil
 }
 
-// RecvPacket4 sends IPv4 packet.
-func RecvPacket4(fd int, b []byte, sip []byte) error {
-	addr := syscall.SockaddrInet4{
-		Addr: [4]byte{sip[0], sip[1], sip[2], sip[3]},
-	}
-
-	if err := syscall.Sendto(fd, b, 0, &addr); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // ========================================================================= //
 // Socket controller
 // ========================================================================= //
