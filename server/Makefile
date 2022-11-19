@@ -8,8 +8,7 @@ GODOC=$(GOCMD)doc
 GOLANGCI=golangci-lint
 DUMPCMD=tcpdump
 
-INTERFACE_REAL=eth0
-INTERFACE_VIRTUAL=echoman_tun
+INTERFACE=eth0
 
 
 
@@ -43,17 +42,11 @@ coverage: ## coverage
 	go test -coverprofile=cover.out ./...
 	go tool cover -html=cover.out -o cover.html
 
-dump-real: ## dump packet
-	$(DUMPCMD) -i ${INTERFACE_REAL}
+dump: ## dump packet
+	$(DUMPCMD) -i ${INTERFACE}
 
-dump-virtual: ## dump packet
-	$(DUMPCMD) -i ${INTERFACE_VIRTUAL}
-
-dump-real/out: ## dump packet and output to file
-	$(DUMPCMD) -i ${INTERFACE_REAL} -w ./debug/dumpfile-server-real.pcapng
-
-dump-virtual/out: ## dump packet and output to file
-	$(DUMPCMD) -i ${INTERFACE_VIRTUAL} -w ./debug/dumpfile-server-virtual.pcapng
+dump/out: ## dump packet and output to file
+	$(DUMPCMD) -i ${INTERFACE} -w ./debug/dumpfile-server.pcapng
 
 listen: ## check listen port
 	lsof -i -P
