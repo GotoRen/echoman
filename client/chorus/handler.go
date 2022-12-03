@@ -62,13 +62,13 @@ func routineChorusPacketSender(c *net.UDPConn, remoteIP net.IP, appPort int) {
 	for {
 		<-t.C
 
-		message := []byte("Ping")
+		request_message := []byte("Ping")
 
 		// Write to TUN internface.
-		if _, err := c.WriteToUDP(message, udpAddr); err != nil {
+		if _, err := c.WriteToUDP(request_message, udpAddr); err != nil {
 			logger.LogErr("Failed to send Chorus packet", "error", err)
 		} else {
-			fmt.Println("[INFO] Send chrous packet:", string(message))
+			fmt.Println("[INFO] Send chrous request packet:", string(request_message))
 		}
 	}
 }
@@ -83,7 +83,7 @@ func routineChorusPacketReceiver(c *net.UDPConn) {
 		if err != nil {
 			logger.LogErr("Failed to receive Chorus packet", "error", err)
 		} else {
-			fmt.Println("[INFO] Receive chrous packet:", string(buf[:size]))
+			fmt.Println("[INFO] Receive chrous response packet:", string(buf[:size]))
 		}
 	}
 }

@@ -24,14 +24,14 @@ func Run() {
 	device.CreateTunInterface()
 	fmt.Println("[INFO] TUN IPv4:", device.Tun.VIP)
 
-	// create the Chorus Application.
+	// create the Chorus application.
 	device.Chorus.PeerIP, device.Chorus.PeerPort = chorus.GetChorusNetworkInfo()
 	chorus.HandlePacket(net.ParseIP(device.Tun.VIP), device.Chorus.PeerIP, device.Chorus.PeerPort)
 
 	go device.RoutineSequentialReceiver()
 	go device.RoutineSequentialSender()
 
-	// continue the main routine.
+	// make the main routine wait.
 	for {
 	}
 }

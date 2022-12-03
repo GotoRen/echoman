@@ -31,36 +31,9 @@ func (device *Device) RoutineSequentialReceiver() {
 			// dstIP := net.IP(buf[layers.IPv4offsetDst : layers.IPv4offsetDst+net.IPv4len]).To4()
 			// dstPort := golayers.UDPPort(binary.BigEndian.Uint16(buf[layers.DstUDPPortOffset : layers.DstUDPPortOffset+layers.DstUDPLength]))
 
-			// fmt.Println("[DEBUG] Peer IPv4 Address", dstIP)
-			// fmt.Println("[DEBUG] Peer IPv4 Port:", dstPort)
-			// fmt.Println("[DEBUG] Chrous app IPv4:", net.ParseIP(device.Tun.VIP).To4())
-			// fmt.Println("[DEBUG] Chrous app Port:", golayers.UDPPort(uint16(device.ChrousPort)))
-
 			if _, err := device.Tun.Device.Tun.Write(buf); err != nil {
 				logger.LogErr("Failed to write to tun/tap interface", "error", err)
 			}
-			// else {
-			// 	/*************************************************************************************
-			// 	 * README: description for Chorus.app *
-			// 	**************************************************************************************
-			// 	 * Checking the TUN -> Application packet flow using source code is complicated.
-			// 	 *   - For the time being, I will check with wireshark.app.
-			// 	 * Thefore, if the write to TUN succeeds, we generate and return a response message.
-			// 	 *   - Write the message generated at this time directly to the Real interface.
-			// 	 * ### Judgment method ###
-			// 	 *   - If the destination is "198.18.9.10:30910", judge it as chorus.app and return the message.
-			// 	 *   - And, return a response to the UDP packet received from the client.
-			// 	*************************************************************************************/
-			// 	if net.ParseIP(device.Tun.VIP).To4().Equal(dstIP) && golayers.UDPPort(uint16(device.ChorusPort)) == dstPort {
-			// 		logger.LogDebug("Receive chorus message", "chrous", "success")
-			// 		res := chorus.GenerateUDPResponsePacket(buf)
-			// 		if _, err := device.Peer.ConnUDP.WriteToUDP(res, &device.Peer.PeerEndPoint); err != nil {
-			// 			logger.LogErr("[Failed] Send chorus message", "error", err)
-			// 		} else {
-			// 			logger.LogDebug("Send chorus message", "chrous", "success")
-			// 		}
-			// 	}
-			// }
 
 		case ipv6.Version:
 			if len(buf) < ipv6.HeaderLen {
