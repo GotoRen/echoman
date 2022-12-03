@@ -24,8 +24,18 @@
 | Echoman Client Virtual IPv6 address | `2001:db8:c0ff:ee00:xxxx:xxxx:xxxx:xxxx/64` |
 
 ## TUN/TAP を介したecho
-- ICMPv4
-<img src="./img/icmpv4.png" alt="ICMPv4.png" />
+<img src="./img/udp.png" alt="udp.png" />
 
-- UDPv4
-<img src="./img/udpv4.png" alt="UDPv4.png" />
+### Echoman server
+- Virtual IP packets
+<img src="./img/server-virtual.png" alt="server-virtual.png" />
+
+- Capsulated IP packets
+<img src="./img/server-real.png" alt="server-real.png" />
+
+### Echoman client
+- Virtual IP packets
+<img src="./img/client-virtual.png" alt="client-virtual.png" />
+
+- Capsulated IP packets
+<img src="./img/client-real.png" alt="client-real.png" />

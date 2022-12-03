@@ -35,14 +35,3 @@ $ make exec/client
 # make run
 ---
 ```
-
-## UDPパケットの生成
-- デフォルトでUDPパケットを生成しない場合、コメントアウトして下さい。
-> ./echoman/client/exec/run.go
-
-```go
-for {
-    <-t.C
-    device.NewChorusUDPPacket() // If you want to generate UDP packets, please uncomment here.
-}
-```

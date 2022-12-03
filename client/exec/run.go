@@ -2,9 +2,8 @@ package exec
 
 import (
 	"fmt"
+	"net"
 	"os"
-	"strconv"
-	"time"
 
 	"github.com/GotoRen/echoman/client/chorus"
 	"github.com/GotoRen/echoman/client/internal"
@@ -13,8 +12,6 @@ import (
 )
 
 func Run() {
-	var err error
-	t := time.NewTicker(time.Second * 1)
 	loadConf()
 
 	device := internal.NewDevice(os.Getenv("LOCAL_INTERFACE"))
@@ -27,26 +24,15 @@ func Run() {
 	device.CreateTunInterface()
 	fmt.Println("[INFO] TUN IPv4:", device.Tun.VIP)
 
-	// Create Application
-	//=======================================================================//
-	device.CreateDescriptor()
-	defer device.Close()
-
-	device.ChorusPort, err = strconv.Atoi(os.Getenv("CHROUS_PORT"))
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// Listens on ports used by applications (chorus) that use the overlay network.
-	chorus.Listen(device.Tun.VIP, device.ChorusPort)
-	//=======================================================================//
+	// create the Chorus application.
+	device.Chorus.PeerIP, device.Chorus.PeerPort = chorus.GetChorusNetworkInfo()
+	chorus.HandlePacket(net.ParseIP(device.Tun.VIP), device.Chorus.PeerIP, device.Chorus.PeerPort)
 
 	go device.RoutineSequentialReceiver()
 	go device.RoutineSequentialSender()
 
+	// make the main routine wait.
 	for {
-		<-t.C
-		device.NewChorusUDPPacket() // If you want to generate UDP packets, please uncomment here.
 	}
 }
 

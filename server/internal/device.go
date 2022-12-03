@@ -31,7 +31,11 @@ type Device struct {
 		mtu    int32
 	}
 
-	ChorusPort int
+	// Stores destination information for Chorus applications
+	Chorus struct {
+		PeerIP   net.IP
+		PeerPort int
+	}
 
 	Peer *Peer
 }

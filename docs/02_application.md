@@ -21,35 +21,3 @@ Client                                             Server
 |                       0.0.0.0:30000 |            | 0.0.0.0:30000                       |
 +-------------------------------------+            +-------------------------------------+ 
 ```
-
-## README !!
-- "TUN - Application" 間のパケットを操作するのがめんどくさい👊
-  - クライアントの動作
-    - Chorusは直接、仮想インターフェースに対して Rawsocket を開き、パケットを直接書き込む
-  - サーバの動作
-    - まず、宛先パケットが `198.18.9.10:30910 (Chorus packet)` であるかどうかを判断する
-    - 次に、実インターフェースから受信したパケットを仮想インターフェースに対してそのまま書き込む
-    - 最後に、仮想インターフェースへの書き込みに成功すると、UDPレスポンスパケットを生成して、実インターフェースに書き込む
-- ソースコード
-```go
-/*************************************************************************************
- * README: description for Chorus.app *
-**************************************************************************************
- * Checking the TUN -> Application packet flow using source code is complicated.
- *   - For the time being, I will check with wireshark.app.
- * Thefore, if the write to TUN succeeds, we generate and return a response message.
- *   - Write the message generated at this time directly to the Real interface.
- * ### Judgment method ###
- *   - If the destination is "198.18.9.10:30910", judge it as chorus.app and return the message.
- *   - And, return a response to the UDP packet received from the client.
-*************************************************************************************/
-if net.ParseIP(device.Tun.VIP).To4().Equal(dstIP) && golayers.UDPPort(uint16(device.ChorusPort)) == dstPort {
-	logger.LogDebug("Receive chorus message", "chrous", "success")
-	res := chorus.GenerateUDPResponsePacket(buf)
-	if _, err := device.Peer.ConnUDP.WriteToUDP(res, &device.Peer.PeerEndPoint); err != nil {
-		logger.LogErr("[Failed] Send chorus message", "error", err)
-	} else {
-		logger.LogDebug("Send chorus message", "chrous", "success")
-	}
-}
-```
