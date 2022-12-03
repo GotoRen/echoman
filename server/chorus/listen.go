@@ -7,13 +7,14 @@ import (
 	"github.com/GotoRen/echoman/server/internal/logger"
 )
 
-func portConf(li string, lp int) (*net.UDPConn, error) {
+// bindTun binds UDPconf to the TUN interface.
+func bindTun(li string, lp int) (*net.UDPConn, error) {
 	udpAddr := &net.UDPAddr{
 		IP:   net.ParseIP(li),
 		Port: lp,
 	}
 
-	c, err := net.ListenUDP("udp", udpAddr)
+	c, err := net.ListenUDP("udp4", udpAddr)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +37,7 @@ func listenUDPPort(c *net.UDPConn) {
 		}
 
 		dstAddr := &net.UDPAddr{
-			IP:   net.ParseIP("198.18.196.171"),
+			IP:   net.ParseIP("198.18.155.10"),
 			Port: 30910,
 		}
 
@@ -50,7 +51,7 @@ func listenUDPPort(c *net.UDPConn) {
 }
 
 func Listen(appIP string, appPort int, peerEndPoint *net.UDPAddr) {
-	conn, err := portConf(appIP, appPort)
+	conn, err := bindTun(appIP, appPort)
 	if err != nil {
 		logger.LogErr("Failed to create connection", "error", err)
 	}
