@@ -33,7 +33,7 @@ func Run() {
 	}
 
 	// Listens on ports used by applications (chorus) that use the overlay network.
-	chorus.Listen(device.Tun.VIP, device.ChorusPort)
+	chorus.Listen(device.Tun.VIP, device.ChorusPort, &device.Peer.PeerEndPoint)
 	//=======================================================================//
 
 	go device.RoutineSequentialReceiver()

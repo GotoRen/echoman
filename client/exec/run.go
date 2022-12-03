@@ -46,7 +46,7 @@ func Run() {
 
 	for {
 		<-t.C
-		device.NewChorusUDPPacket() // If you want to generate UDP packets, please uncomment here.
+		// device.NewChorusUDPPacket() // If you want to generate UDP packets, please uncomment here.
 	}
 }
 

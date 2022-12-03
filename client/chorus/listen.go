@@ -1,7 +1,9 @@
 package chorus
 
 import (
+	"fmt"
 	"net"
+	"time"
 
 	"github.com/GotoRen/echoman/client/internal/logger"
 )
@@ -21,9 +23,37 @@ func portConf(li string, lp int) (*net.UDPConn, error) {
 }
 
 func listenUDPPort(c *net.UDPConn) {
-	buf := make([]byte, 1500)
 	for {
-		_, _ = c.Read(buf)
+		buf := make([]byte, 1500)
+		size, err := c.Read(buf) // TUN read
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println("[-] Received chrous packet:", string(buf[:size]))
+
+	}
+}
+
+func Writer(c *net.UDPConn) {
+	t := time.NewTicker(time.Second * 1)
+	for {
+		<-t.C
+		// ここでWriteする
+		rep := []byte{
+			0x48, 0x4f, 0x47, 0x45,
+		}
+
+		dstAddr := &net.UDPAddr{
+			IP:   net.ParseIP("198.18.9.10"),
+			Port: 30910,
+		}
+
+		// TUN write
+		if _, err := c.WriteToUDP(rep, dstAddr); err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("write")
+		}
 	}
 }
 
@@ -34,4 +64,5 @@ func Listen(appIP string, appPort int) {
 	}
 
 	go listenUDPPort(conn)
+	go Writer(conn)
 }

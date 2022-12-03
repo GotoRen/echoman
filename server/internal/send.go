@@ -33,6 +33,24 @@ func (device *Device) RoutineSequentialSender() {
 			// fmt.Println("[DEBUG] Received IPv4 packet from TUN/TAP", buf[:size])
 			// dst := buf[layers.IPv4offsetDst : layers.IPv4offsetDst+net.IPv4len]
 
+			// //--------------------------------------------------------//
+			// // if net.ParseIP(device.Tun.VIP).To4().Equal(dst) && golayers.UDPPort(uint16(device.ChorusPort)) == dstPort {
+			// // 	logger.LogDebug("Receive chorus message", "chrous", "success")
+			// // 	// res := chorus.GenerateUDPResponsePacket(buf)
+			// // 	// if _, err := device.Peer.ConnUDP.WriteToUDP(res, &device.Peer.PeerEndPoint); err != nil {
+			// // 	// 	logger.LogErr("[Failed] Send chorus message", "error", err)
+			// // 	// } else {
+			// // 	// 	logger.LogDebug("Send chorus message", "chrous", "success")
+			// // 	// }
+			// // }
+			// if net.ParseIP("198.18.153.102").To4().Equal(dst) {
+			// 	fmt.Println("OK")
+			// }
+
+			// //--------------------------------------------------------//
+
+			fmt.Println("OK")
+
 			if _, err := device.Peer.ConnUDP.WriteToUDP(buf, &device.Peer.PeerEndPoint); err != nil {
 				logger.LogErr("Failed to write to real interface", "error", err)
 			}

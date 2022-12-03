@@ -1,6 +1,7 @@
 package chorus
 
 import (
+	"fmt"
 	"net"
 
 	"github.com/GotoRen/echoman/server/internal/logger"
@@ -21,13 +22,34 @@ func portConf(li string, lp int) (*net.UDPConn, error) {
 }
 
 func listenUDPPort(c *net.UDPConn) {
-	buf := make([]byte, 1500)
 	for {
-		_, _ = c.Read(buf)
+		buf := make([]byte, 1500)
+		size, err := c.Read(buf) // TUN read
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		fmt.Println("[+] Received chrous packet:", string(buf[:size]))
+
+		rep := []byte{
+			0x50, 0x6e, 0x6e, 0x67,
+		}
+
+		dstAddr := &net.UDPAddr{
+			IP:   net.ParseIP("198.18.196.171"),
+			Port: 30910,
+		}
+
+		// TUN write
+		if _, err = c.WriteToUDP(rep, dstAddr); err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("write")
+		}
 	}
 }
 
-func Listen(appIP string, appPort int) {
+func Listen(appIP string, appPort int, peerEndPoint *net.UDPAddr) {
 	conn, err := portConf(appIP, appPort)
 	if err != nil {
 		logger.LogErr("Failed to create connection", "error", err)
