@@ -25,3 +25,17 @@
 
 ## TUN/TAP を介したecho
 <img src="./img/udp.png" alt="udp.png" />
+
+### Echoman server
+- Virtual IP packets
+<img src="./img/server-virtual.png" alt="server-virtual.png" />
+
+- Capsulated IP packets
+<img src="./img/server-real.png" alt="server-real.png" />
+
+### Echoman client
+- Virtual IP packets
+<img src="./img/client-virtual.png" alt="client-virtual.png" />
+
+- Capsulated IP packets
+<img src="./img/client-real.png" alt="client-real.png" />
